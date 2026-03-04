@@ -6,5 +6,5 @@
 
 ## Contributors
 - Benjamin Ledoux
-- 
+- Charles Tenuta
 - 
