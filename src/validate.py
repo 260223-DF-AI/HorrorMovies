@@ -1,5 +1,10 @@
 import pandas as pd
 
+"""
+Functionality related to cleansing & validating our dataset
+"""
+
+
 def validate_data(file_path: str) -> pd.DataFrame:
     """Return DataFrame storing validated dataset."""
 
