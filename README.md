@@ -7,4 +7,4 @@
 ## Contributors
 - Benjamin Ledoux
 - Charles Tenuta
-- 
+- Joseph Barroso
