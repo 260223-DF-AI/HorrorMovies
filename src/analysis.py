@@ -25,5 +25,22 @@ def analyze_basic_data(df: pd.DataFrame) -> dict:
 
     return basic_data
 
+def analyze_column(df: pd.DataFrame, column: str) -> dict:
+    """
+    Analyze a specific column in the provided DataFrame and return a dict. with basic results.
+
+    Args:
+        df: DataFrame to be analyzed
+        column: Column name to be analyzed
+
+    Returns:
+        column_data: Dict. containing basic analysis results for the specified column
+    """
+    column_data = {}
+
+    # retrieve basic data and append the key-value pairs to the column_data dict.
+
+    return column_data
+
 # for testing purposes
 print(analyze_basic_data(load_data("data/horror_movies.csv")))
