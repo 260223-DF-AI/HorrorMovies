@@ -63,6 +63,10 @@ def validate_data(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 def code_to_language_name(code):
+    if (code == "cn"):
+        return "Chinese"
+    elif (code == "xx"):
+        return "Unknown"
     try:
         lang = languages.get(alpha_2=code)
         return lang.name if lang else code  # fallback to original code if not found
