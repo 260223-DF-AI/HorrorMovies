@@ -42,9 +42,9 @@ def validate_data(df: pd.DataFrame) -> pd.DataFrame:
     - Type checking
     - Fill/Drop missing values
     """
-    df.drop_duplicates()
+    df = df.drop_duplicates()
     # Drop unused columns
-    df.drop(columns=["poster_path", "status", "backdrop_path"])
+    df = df.drop(columns=["poster_path", "status", "backdrop_path"])
 
     # Try to fill missing title/original_title with original_title/title respectively
     df["title"] = df["title"].fillna(df["original_title"])
@@ -79,15 +79,13 @@ def validate_data(df: pd.DataFrame) -> pd.DataFrame:
 def code_to_language_name(code):
     if (code == "cn"):
         return "Chinese"
-    elif (code == "xx"):
-        return "Unknown"
     try:
         lang = languages.get(alpha_2=code)
-        return lang.name if lang else code  # fallback to original code if not found
+        return lang.name if lang else "Unknown"  # fallback to original code if not found
     except Exception:
         return code
 
 # for testing
 if __name__ == "__main__":
-    # print(load_data("data/horror_movies.csv")["original_language"].unique())
-    print(load_data("data/sample.json"))
+    print(load_data("data/horror_movies.csv").shape)
+    # print(load_data("data/sample.json"))
