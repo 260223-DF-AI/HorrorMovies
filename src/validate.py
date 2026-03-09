@@ -1,3 +1,5 @@
+import re
+
 import pandas as pd
 from pycountry import languages
 
@@ -16,8 +18,20 @@ def load_data(filepath: str) -> pd.DataFrame:
     Returns:
         df (pd.DataFrame): Parsed and cleaned dataframe.
     """
-    df = pd.read_csv(filepath)
-    df = validate_data(df)
+
+    # match string after final period to get file extension
+    extension = re.match(r".*\.([^.]+)$", filepath).group(1).lower()
+    if extension == "csv":
+        df = pd.read_csv(filepath)
+    elif extension == "json":
+        df = pd.read_json(filepath)
+    else:
+        raise ValueError("Unsupported file format")
+
+    # validate_data assumes horror data, maybe we make it more generic
+    # and have separate validate_horror_data func
+    if filepath == "data/horror_movies.csv": 
+        df = validate_data(df)
 
     return df
 
@@ -75,4 +89,5 @@ def code_to_language_name(code):
 
 # for testing
 if __name__ == "__main__":
-    print(load_data("data/horror_movies.csv")["original_language"].unique())
+    # print(load_data("data/horror_movies.csv")["original_language"].unique())
+    print(load_data("data/sample.json"))
