@@ -3,7 +3,7 @@ For analysis-related functionality
 """
 
 import pandas as pd
-from validate import load_data
+from src.validate import load_data
 
 def analyze_basic_data(df: pd.DataFrame) -> dict:
     """
@@ -26,4 +26,4 @@ def analyze_basic_data(df: pd.DataFrame) -> dict:
     return basic_data
 
 # for testing purposes
-print(analyze_basic_data(load_data("../data/horror_movies.csv")))
+print(analyze_basic_data(load_data("data/horror_movies.csv")))
