@@ -1,4 +1,5 @@
 import pandas as pd
+from pycountry import languages
 
 """
 Functionality related to cleansing & validating our dataset
@@ -55,12 +56,19 @@ def validate_data(df: pd.DataFrame) -> pd.DataFrame:
     # String standardization
     df["original_title"] = df["original_title"].str.title().str.strip()
     df["title"] = df["title"].str.title().str.strip()
-    df["original_language"] = df["original_language"].str.title().str.strip()
+    df["original_language"] = df["original_language"].str.strip().map(code_to_language_name)
     df["genre_names"] = df["genre_names"].str.title().str.strip()
     df["collection_name"] = df["collection_name"].str.title().str.strip()
 
     return df
 
+def code_to_language_name(code):
+    try:
+        lang = languages.get(alpha_2=code)
+        return lang.name if lang else code  # fallback to original code if not found
+    except Exception:
+        return code
+
 # for testing
 if __name__ == "__main__":
-    print(validate_data("data/horror_movies.csv").head())
+    print(load_data("data/horror_movies.csv")["original_language"].unique())
