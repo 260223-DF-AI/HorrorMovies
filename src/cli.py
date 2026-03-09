@@ -48,16 +48,17 @@ def menu() -> None:
         columns.add_renderable(f"[b]{index}.[/] {option}")
 
     layout: Layout = get_menu_layout()
+    console.print(layout)
     layout["options"].update(Align(columns, vertical="middle"))
     # console.print(layout)
     # print(layout)
 
-    with Live(layout, screen=True) as live:
-        try:
-            while True:
-                sleep(1)
-        except KeyboardInterrupt:
-            exit()
+    # with Live(layout, screen=True) as live:
+    #     try:
+    #         while True:
+    #             sleep(1)
+    #     except KeyboardInterrupt:
+    #         exit()
 
 
 
@@ -76,7 +77,7 @@ def get_menu_layout() -> Layout:
     layout.split(
         Layout(name="header", size=2),
         Layout(ratio=1, name="main"),
-        Layout(size=10, name="footer")
+        # Layout(size=10, name="footer")
     )
 
     layout["header"].update(Align.center(Text("Horror Movies Data Analysis", style="#FCB8EC bold underline")))
@@ -134,7 +135,7 @@ if __name__ == "__main__":
     df_to_show: pd.DataFrame = df.head().iloc[:, :5]
     df_to_show = df_to_show.drop(columns=["overview"])
 
-    # print(create_df_table(df_to_show, title="Horror Movies Dataset Sample"))
+    print(create_df_table(df_to_show, title="Horror Movies Dataset Sample"))
 
-    menu()
+    # menu()
 
