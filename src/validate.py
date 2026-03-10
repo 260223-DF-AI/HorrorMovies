@@ -95,5 +95,7 @@ def code_to_language_name(code):
 
 # for testing
 if __name__ == "__main__":
-    print(load_data("data/horror_movies.csv").shape)
+    df, rejects = load_data("data/horror_movies.csv")
+    print(df.shape)
+    print(rejects.shape)
     # print(load_data("data/sample.json"))
