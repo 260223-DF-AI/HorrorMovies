@@ -41,8 +41,12 @@ def validate_data(df: pd.DataFrame) -> pd.DataFrame:
     - Drop duplicates
     - Type checking
     - Fill/Drop missing values
+
+    Returns:
+    - df (pd.DataFrame): Cleaned and validated data
+    - rejects_df (pd.DataFrame): Any entries dropped (duplicates and entries missing id original_title or title)
     """
-    df = df.drop_duplicates()
+    # df = df.drop_duplicates()
     # Drop unused columns
     df = df.drop(columns=["poster_path", "status", "backdrop_path"])
 
@@ -52,7 +56,11 @@ def validate_data(df: pd.DataFrame) -> pd.DataFrame:
 
     # Fill/Drop Missing Values
     # If both original_title and title were missing, they will remain as NaN, drop
-    df = df.dropna(subset=["id", "original_title", "title"])
+    drop_mask = df.duplicated() | df[["id", "original_title", "title"]].isna().any(axis=1)
+    rejects_df = df[drop_mask]
+    df = df[~drop_mask]
+
+    # df = df.dropna(subset=["id", "original_title", "title"])
 
     # Type Checking
     # TODO: maybe drop type conversions (to_numeric, to_datetime, astype), only adding right now as confirmation read_csv properly converted everything
@@ -74,7 +82,7 @@ def validate_data(df: pd.DataFrame) -> pd.DataFrame:
     df["genre_names"] = df["genre_names"].str.title().str.strip()
     df["collection_name"] = df["collection_name"].str.title().str.strip()
 
-    return df
+    return df, rejects_df
 
 def code_to_language_name(code):
     if (code == "cn"):
@@ -87,5 +95,7 @@ def code_to_language_name(code):
 
 # for testing
 if __name__ == "__main__":
-    print(load_data("data/horror_movies.csv").shape)
+    df, rejects = load_data("data/horror_movies.csv")
+    print(df.shape)
+    print(rejects.shape)
     # print(load_data("data/sample.json"))
