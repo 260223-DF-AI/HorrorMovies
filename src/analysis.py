@@ -25,5 +25,32 @@ def analyze_basic_data(df: pd.DataFrame) -> dict:
 
     return basic_data
 
+def analyze_column(df: pd.DataFrame, column: str) -> dict:
+    """
+    Analyze a specific column in the provided DataFrame and return a dict. with basic results.
+
+    Args:
+        df: DataFrame to be analyzed
+        column: Column name to be analyzed
+
+    Returns:
+        column_data: Dict. containing basic analysis results for the specified column
+    """
+    column_data = {}
+
+    # retrieve basic data and append the key-value pairs to the column_data dict.
+
+    # finds the most common value within a column. could be useful for "genre" and "collection_name"
+    column_data["most_common_value"] = int(df[column].mode()[0])
+
+    # finds the highest value in a column. good for finding highest grossing or highest budget
+    column_data["highest_value"] = df.loc[df[column].idxmax()]["title"]
+
+    # finds the lowest value in a column. good for finding lowest grossing or lowest budget
+    column_data["lowest_value"] = df.loc[df[column].idxmin()]["title"]
+
+    return column_data
+
 # for testing purposes
 print(analyze_basic_data(load_data("data/horror_movies.csv")))
+print(analyze_column(load_data("data/horror_movies.csv"), "budget"))
