@@ -6,7 +6,7 @@ import pandas as pd
 def get_connection():
     try:
         return psycopg2.connect(
-            database="postgres",
+            database="horror_movies",
             user="postgres",
             password="password",
             host="localhost",
