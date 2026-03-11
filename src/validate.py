@@ -51,7 +51,7 @@ def validate_data(df: pd.DataFrame):
     """
     # df = df.drop_duplicates()
     # Drop unused columns
-    df = df.drop(columns=["poster_path", "status", "backdrop_path"])
+    df = df.drop(columns=["poster_path", "status", "backdrop_path", "adult"])
 
     # Try to fill missing title/original_title with original_title/title respectively
     df["title"] = df["title"].fillna(df["original_title"])

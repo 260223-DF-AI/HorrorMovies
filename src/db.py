@@ -92,7 +92,17 @@ def setup():
     valid_df, rejects_df = load_data("data/horror_movies.csv")
     
     # Create dataframes for individual tables
-    movie_df = valid_df[["id", "original_title", "title", "original_language", "release_date", "rating", ""]]
+    movie_df = valid_df[["id", "original_title", "title", "original_language", "release_date"]]
+    metadata_df = valid_df[["id", "overview", "tagline", "adult"]]
+    rating_df = valid_df[["id", "popularity", "vote_count", "vote_average"]]
+    finance_df = valid_df[["id", "budget", "revenue"]]
+    # genre_df = valid_df[["genre_names"]]
+
+    movie_df.to_sql(name="movies", con=engine, index=False)
+    metadata_df.to_sql(name="metadatas", con=engine, index=False)
+    rating_df.to_sql(name="ratings", con=engine, index=False)
+    finance_df.to_sql(name="finances", con=engine, index=False)
+
 
 
 
