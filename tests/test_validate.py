@@ -7,8 +7,8 @@ import pytest
 from src.validate import load_data
 
 @pytest.mark.parametrize("filepath,column,row", [
-    ("data/horror_movies.csv", 32540, 17),
-    ("data/horror_movies.json", 32540, 17)
+    ("data/horror_movies.csv", 32540, 16),
+    ("data/horror_movies.json", 32540, 16)
 ])
 def test_load_data(filepath, column, row):
     """Test loading our files and validating the data"""
@@ -20,6 +20,8 @@ def test_load_data(filepath, column, row):
     # ideal number of columns and rows after validation
     assert df.shape[0] == column
     assert df.shape[1] == row
+
+    assert df.at[10, "original_title"] == "The Exorcism Of God"
 
 def test_nonexistent_file():
     """Test loading a file that does not exist"""
