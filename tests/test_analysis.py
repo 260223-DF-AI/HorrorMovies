@@ -8,8 +8,9 @@ from src.analysis import analyze_basic_data
 from src.validate import load_data
 
 def test_analyze_basic_data():
-    df: pd.DataFrame = load_data("data/horror_movies.csv")
-    results: dict = analyze_basic_data(df)
+    # discard rejects, unnecessary for test
+    df_valid, _ = load_data("data/horror_movies.csv")
+    results: dict = analyze_basic_data(df_valid)
 
     assert isinstance(results, dict)
 
