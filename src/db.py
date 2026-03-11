@@ -90,28 +90,32 @@ def setup():
     engine = create_engine(CS)
 
     valid_df, rejects_df = load_data("data/horror_movies.csv")
+
+    rejects_df.to_sql(name="horror_movies_rejects", con=engine, index=False, if_exists="replace")
     
     # Create dataframes for individual tables
     movie_df = valid_df[["id", "original_title", "title", "original_language", "release_date"]]
     metadata_df = valid_df[["id", "overview", "tagline"]]
     rating_df = valid_df[["id", "popularity", "vote_count", "vote_average"]]
     finance_df = valid_df[["id", "budget", "revenue"]]
-    # genre_df = valid_df[["genre_names"].str.split(", ")]
     genre_names: list = valid_df["genre_names"].tolist() #.apply(lambda x : x.split(", "))
     genre_list: list = [name.split(", ") for name in genre_names]
     genres_flat = [name for sublist in genre_list for name in sublist]
     genres_unique: set = set(genres_flat)
     genre_df = pd.DataFrame(genres_unique, columns=["genre_name"])
-    # print(genre_df)
-    # print(genre_df[["genre_names"]]).head()
 
-    # movie_df.to_sql(name="movies", con=engine, index=False, if_exists="replace")
-    # metadata_df.to_sql(name="metadatas", con=engine, index=False, if_exists="replace")
-    # rating_df.to_sql(name="ratings", con=engine, index=False, if_exists="replace")
-    # finance_df.to_sql(name="finances", con=engine, index=False, if_exists="replace")
-    # genre_df.to_sql(name="genres", con=engine, index=True, if_exists="replace")
+    collections_df = valid_df[["collection", "collection_name"]]
+    collections_df = collections_df.rename(columns={"collection": "collection_id"})
+    collections_df = collections_df.dropna().drop_duplicates()
 
-    # print(genre_names)
+    movie_df.to_sql(name="movies", con=engine, index=False, if_exists="replace")
+    metadata_df.to_sql(name="metadatas", con=engine, index=False, if_exists="replace")
+    rating_df.to_sql(name="ratings", con=engine, index=False, if_exists="replace")
+    finance_df.to_sql(name="finances", con=engine, index=False, if_exists="replace")
+    genre_df.to_sql(name="genres", con=engine, index=True, if_exists="replace")
+    collections_df.to_sql(name="collections", con=engine, index=False, if_exists="replace")
+
+
     for index, genres_str in enumerate(genre_names):
         for genre in genres_str.split(", "):
             # get movie id for movie attached to the genre we are operating on
