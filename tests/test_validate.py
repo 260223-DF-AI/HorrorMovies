@@ -21,6 +21,7 @@ def test_load_data(filepath, column, row):
     assert df.shape[0] == column
     assert df.shape[1] == row
 
+    # check that the original title in a specified cell is correct
     assert df.at[10, "original_title"] == "The Exorcism Of God"
 
 def test_nonexistent_file():
