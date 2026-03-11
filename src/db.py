@@ -3,7 +3,7 @@ import pandas as pd
 import psycopg2
 from sqlalchemy import create_engine, ForeignKey
 from sqlalchemy.types import * #replace with only necessary types
-from sqlalchemy.orm import DeclarativeBasem, Mapped, mapped_column, relationship
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from dotenv import load_dotenv
 from datetime import datetime
 import os
@@ -21,10 +21,10 @@ class Movie(Base):
     original_title: Mapped[str] = mapped_column(String(50), nullable=False)
     title: Mapped[str] = mapped_column(String(50), nullable=False)
     original_language: Mapped[str] = mapped_column(String(2), nullable=False)
-    metadata: Mapped["Metadata"] = mapped_column(ForeignKey("metadatas.id"))
+    # metadata: Mapped["Metadata"] = mapped_column(ForeignKey("metadatas.id"))
     release_date: Mapped[datetime] = mapped_column(Date)
-    rating: Mapped["Rating"] = mapped_column(ForeignKey("ratings.id"))
-    finance: Mapped["Finance"] = mapped_column(ForeignKey("finances.id"))
+    # rating: Mapped["Rating"] = mapped_column(ForeignKey("ratings.id"))
+    # finance: Mapped["Finance"] = mapped_column(ForeignKey("finances.id"))
     genres: Mapped[list["Genre"]] = relationship("genres", back_populates="movies")
     # collection_id: Mapped[int] = mapped_column(ForeignKey("collections.id"))
     collection: Mapped["Collection"] = relationship("collections", back_populates="movies")
@@ -32,8 +32,8 @@ class Movie(Base):
 class Metadata(Base):
     __tablename__ = "metadatas"
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    movie_id: Mapped[int] = mapped_column(ForeignKey("movies.id"))
+    # id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    movie_id: Mapped[int] = mapped_column(ForeignKey("movies.id"), primary_key=True)
     overview: Mapped[str] = mapped_column(Text)
     tagline: Mapped[str] = mapped_column(Text)
     adult: Mapped[str] = mapped_column(Boolean)
@@ -41,8 +41,8 @@ class Metadata(Base):
 class Rating(Base):
     __tablename__ = "ratings"
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    movie_id: Mapped[int] = mapped_column(ForeignKey("movies.id"))
+    # id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    movie_id: Mapped[int] = mapped_column(ForeignKey("movies.id"), primary_key=True)
     popularity: Mapped[float] = mapped_column(Float)
     vote_count: Mapped[int] = mapped_column(Integer)
     vote_average: Mapped[float] = mapped_column(Float)
@@ -50,8 +50,8 @@ class Rating(Base):
 class Finance(Base):
     __tablename__ = "finances"
 
-    id: Mapped[int] = mapped_column()
-    movie_id: Mapped[int] = mapped_column(ForeignKey("movies.id"))
+    # id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    movie_id: Mapped[int] = mapped_column(ForeignKey("movies.id"), primary_key=True)
     budget: Mapped[int] = mapped_column(Integer)
     revenue: Mapped[int] = mapped_column(Integer)
 
@@ -89,7 +89,11 @@ def setup():
     CS = os.getenv("CS")
     engine = create_engine(CS)
 
-    valid, rejects = load_data()
+    valid_df, rejects_df = load_data("data/horror_movies.csv")
+    
+    # Create dataframes for individual tables
+    movie_df = valid_df[["id", "original_title", "title", "original_language", "release_date", "rating", ""]]
+
 
 
 if __name__ == "__main__":
