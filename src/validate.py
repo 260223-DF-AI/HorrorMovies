@@ -3,7 +3,7 @@ import re
 import pandas as pd
 from pycountry import languages
 
-from logger import log_execution, logger
+from .logger import log_execution, logger
 
 """
 Functionality related to cleansing & validating our dataset
@@ -32,14 +32,13 @@ def load_data(filepath: str) -> pd.DataFrame:
 
     # validate_data assumes horror data, maybe we make it more generic
     # and have separate validate_horror_data func
-    if filepath == "data/horror_movies.csv": 
-        df = validate_data(df)
+    df_valid, df_rejects = validate_data(df)
 
-    return df
+    return df_valid, df_rejects
 
 
 @log_execution
-def validate_data(df: pd.DataFrame) -> pd.DataFrame:
+def validate_data(df: pd.DataFrame):
     """
     Clean and validate provided DataFrame
     - Drop duplicates

@@ -1,7 +1,6 @@
 """
 Test functionality from validate.py
 """
-
 import pandas as pd
 import pytest
 

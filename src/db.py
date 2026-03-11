@@ -8,14 +8,8 @@ from dotenv import load_dotenv
 from datetime import datetime
 import os
 
+from .validate import load_data
 
-def setup():
-    """
-    Setup connection to PostgreSQL database using SQLAlchemy
-    """
-    load_dotenv()
-    CS = os.getenv("CS")
-    engine = create_engine(CS)
 
 class Base(DeclarativeBase):
     pass
@@ -87,5 +81,16 @@ class Collection(Base):
     movies: Mapped[list["Movie"]] = relationship("movies", back_populates="collections")
 
 
+def setup():
+    """
+    Setup connection to PostgreSQL database using SQLAlchemy
+    """
+    load_dotenv()
+    CS = os.getenv("CS")
+    engine = create_engine(CS)
+
+    valid, rejects = load_data()
+
+
 if __name__ == "__main__":
-    pass
+    setup()
