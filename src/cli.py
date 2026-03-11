@@ -23,7 +23,7 @@ from rich.text import Text
 
 from time import sleep
 
-from validate import validate_data
+from .validate import load_data, validate_data
 
 
 def menu() -> None:
@@ -111,12 +111,16 @@ def create_df_table(df: pd.DataFrame, title:str="Data") -> Table:
     table: Table = Table(title=title)
 
     # style each row, alternating dim and not dim
-    table.row_styles = ["green not dim", "green dim"]
+    # table.row_styles = ["green not dim", "green dim"]
+    table.row_styles = ["not dim", "dim"]
     
 
     # add df column headers to the table
-    for col in df.columns:
-        table.add_column(f"[bold purple]{col.title()}[/]")
+    for index, col in enumerate(df.columns):
+        if index % 2 == 0:
+            table.add_column(f"[bold purple]{col.title()}[/]", style="#ad97e3")
+        else:
+            table.add_column(f"[bold green]{col.title()}[/]", style="green")
 
     # add df row values to the table
     for row in df.values:
@@ -129,7 +133,8 @@ def create_df_table(df: pd.DataFrame, title:str="Data") -> Table:
 
 if __name__ == "__main__":
 
-    df: pd.DataFrame = validate_data("data/horror_movies.csv")
+
+    df, df_rejects = load_data("data/horror_movies.csv")
 
     # small 4 column dataframe preview for testing
     df_to_show: pd.DataFrame = df.head().iloc[:, :5]
