@@ -1,0 +1,5 @@
+{
+    "data_source": "data/horror_movies.csv",
+    "logging_level": "INFO",
+    "log_format": "%(asctime)s | %(levelname)s | %(message)s"
+}

@@ -1,13 +1,27 @@
 import logging
 from functools import wraps
 
-log_path: str = "logs/log.log"
-log_format: str = "%(asctime)s | %(levelname)s | %(message)s"
+from .config import get_configs
+
+log_str_to_obj: dict = {
+    "INFO": logging.INFO,
+    "DEBUG": logging.DEBUG,
+    "WARNING": logging.WARNING,
+    "ERROR": logging.ERROR,
+    "CRITICAL": logging.CRITICAL
+}
+
+# Retrieve log path & format from config file, or use defaults
+configs: dict = get_configs()
+log_path: str = configs.get("log_path", "logs/log.log")
+log_format: str = configs.get("log_format", "%(asctime)s | %(levelname)s | %(message)s")
+logging_level: int = log_str_to_obj.get(configs.get("logging_level", "INFO"), logging.INFO)
+
 logging.basicConfig(
     filename=log_path,
     format=log_format,
     filemode="w",
-    level=logging.INFO)
+    level=logging_level)
 
 # Initialize logger
 logger = logging.getLogger(__name__)

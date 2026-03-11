@@ -3,8 +3,10 @@ For analysis-related functionality
 """
 
 import pandas as pd
-from src.validate import load_data
+from .validate import load_data
+from .logger import log_execution
 
+@log_execution
 def analyze_basic_data(df: pd.DataFrame) -> dict:
     """
     Analyze the provided DataFrame and return a dict. with very basic results.
@@ -25,6 +27,8 @@ def analyze_basic_data(df: pd.DataFrame) -> dict:
 
     return basic_data
 
+
+@log_execution
 def analyze_column(df: pd.DataFrame, column: str) -> dict:
     """
     Analyze a specific column in the provided DataFrame and return a dict. with basic results.

@@ -1,5 +1,7 @@
 import pandas as pd
+from .logger import log_execution
 
+@log_execution
 def filter(df: pd.DataFrame, column: str, range_start=None, range_end=None) -> pd.DataFrame:
     """
     Filters dataframe down to a range for a given column

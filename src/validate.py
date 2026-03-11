@@ -3,11 +3,13 @@ import re
 import pandas as pd
 from pycountry import languages
 
+from logger import log_execution, logger
+
 """
 Functionality related to cleansing & validating our dataset
 """
 
-
+@log_execution
 def load_data(filepath: str) -> pd.DataFrame:
     """
     Load data from file, parse through and clean for analysis and manipulation
@@ -35,6 +37,8 @@ def load_data(filepath: str) -> pd.DataFrame:
 
     return df
 
+
+@log_execution
 def validate_data(df: pd.DataFrame) -> pd.DataFrame:
     """
     Clean and validate provided DataFrame
@@ -84,13 +88,15 @@ def validate_data(df: pd.DataFrame) -> pd.DataFrame:
 
     return df, rejects_df
 
+@log_execution
 def code_to_language_name(code):
     if (code == "cn"):
         return "Chinese"
     try:
         lang = languages.get(alpha_2=code)
         return lang.name if lang else "Unknown"  # fallback to original code if not found
-    except Exception:
+    except Exception as e:
+        logger.error(f"Exception: {e} for country code {code}")
         return code
 
 # for testing
