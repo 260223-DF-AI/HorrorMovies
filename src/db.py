@@ -93,16 +93,23 @@ def setup():
     
     # Create dataframes for individual tables
     movie_df = valid_df[["id", "original_title", "title", "original_language", "release_date"]]
-    metadata_df = valid_df[["id", "overview", "tagline", "adult"]]
+    metadata_df = valid_df[["id", "overview", "tagline"]]
     rating_df = valid_df[["id", "popularity", "vote_count", "vote_average"]]
     finance_df = valid_df[["id", "budget", "revenue"]]
-    # genre_df = valid_df[["genre_names"]]
+    # genre_df = valid_df[["genre_names"].str.split(", ")]
+    genre_names: list = valid_df["genre_names"].tolist() #.apply(lambda x : x.split(", "))
+    genre_list: list = [name.split(", ") for name in genre_names]
+    genres_flat = [name for sublist in genre_list for name in sublist]
+    genres_unique: set = set(genres_flat)
+    genre_df = pd.DataFrame(genres_unique)
+    # print(genre_df)
+    # print(genre_df[["genre_names"]]).head()
 
-    movie_df.to_sql(name="movies", con=engine, index=False)
-    metadata_df.to_sql(name="metadatas", con=engine, index=False)
-    rating_df.to_sql(name="ratings", con=engine, index=False)
-    finance_df.to_sql(name="finances", con=engine, index=False)
-
+    movie_df.to_sql(name="movies", con=engine, index=False, if_exists="replace")
+    metadata_df.to_sql(name="metadatas", con=engine, index=False, if_exists="replace")
+    rating_df.to_sql(name="ratings", con=engine, index=False, if_exists="replace")
+    finance_df.to_sql(name="finances", con=engine, index=False, if_exists="replace")
+    genre_df.to_sql(name="genres", con=engine, index=True, if_exists="replace")
 
 
 

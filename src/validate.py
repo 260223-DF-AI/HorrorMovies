@@ -75,7 +75,6 @@ def validate_data(df: pd.DataFrame):
     df["budget"] = pd.to_numeric(df["budget"])
     df["revenue"] = pd.to_numeric(df["revenue"])
     df["runtime"] = pd.to_numeric(df["runtime"])
-    df["adult"] = df["adult"].astype("bool")
     df["collection"] = pd.to_numeric(df["collection"])
 
     # String standardization
