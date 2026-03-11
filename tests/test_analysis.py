@@ -9,7 +9,7 @@ from src.validate import load_data
 
 def test_analyze_basic_data():
     # discard rejects, unnecessary for test
-    df_valid, _ = load_data("data/horror_movies.csv")
+    df_valid, df_rejects = load_data("data/horror_movies.csv")
     results: dict = analyze_basic_data(df_valid)
 
     assert isinstance(results, dict)

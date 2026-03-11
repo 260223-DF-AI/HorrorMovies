@@ -55,6 +55,8 @@ def analyze_column(df: pd.DataFrame, column: str) -> dict:
 
     return column_data
 
-# for testing purposes
-print(analyze_basic_data(load_data("data/horror_movies.csv")))
-print(analyze_column(load_data("data/horror_movies.csv"), "budget"))
+
+if __name__ == "__main__":
+    # for testing purposes
+    print(analyze_basic_data(load_data("data/horror_movies.csv")))
+    print(analyze_column(load_data("data/horror_movies.csv"), "budget"))
