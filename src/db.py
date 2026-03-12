@@ -99,10 +99,13 @@ def setup():
     rating_df = valid_df[["id", "popularity", "vote_count", "vote_average"]]
     finance_df = valid_df[["id", "budget", "revenue"]]
     genre_names: list = valid_df["genre_names"].tolist() #.apply(lambda x : x.split(", "))
+    # build unique genres list and a numeric id for each one
     genre_list: list = [name.split(", ") for name in genre_names]
     genres_flat = [name for sublist in genre_list for name in sublist]
-    genres_unique: set = set(genres_flat)
+    # sort so the resulting ids are deterministic
+    genres_unique = sorted(set(genres_flat))
     genre_df = pd.DataFrame(genres_unique, columns=["genre_name"])
+    genre_df["id"] = range(len(genre_df))
 
     collections_df = valid_df[["collection", "collection_name"]]
     collections_df = collections_df.rename(columns={"collection": "collection_id"})
@@ -112,22 +115,27 @@ def setup():
     metadata_df.to_sql(name="metadatas", con=engine, index=False, if_exists="replace")
     rating_df.to_sql(name="ratings", con=engine, index=False, if_exists="replace")
     finance_df.to_sql(name="finances", con=engine, index=False, if_exists="replace")
-    genre_df.to_sql(name="genres", con=engine, index=True, if_exists="replace")
+    genre_df.to_sql(name="genres", con=engine, index=False, if_exists="replace")
     collections_df.to_sql(name="collections", con=engine, index=False, if_exists="replace")
 
+    # explode the genre_names field into one row per (movie, genre)
+    exploded = valid_df[["id", "genre_names"]].copy()
+    exploded = exploded.assign(
+        genre_name=exploded["genre_names"].str.split(", ")
+    ).explode("genre_name")
+    exploded = exploded.drop(columns=["genre_names"])
 
-    for index, genres_str in enumerate(genre_names):
-        for genre in genres_str.split(", "):
-            # get movie id for movie attached to the genre we are operating on
-            movie_id = valid_df.loc[index].id
+    # merge with genre_df to get the numeric genre id
+    movie_genre_df = exploded.merge(genre_df, on="genre_name", how="left")
+    movie_genre_df = movie_genre_df.rename(columns={"id_x": "movie_id", "id_y": "genre_id"})
 
-            # get the genre id for the genre string we are operating on
-            genre_id = genre_df.loc[genre_df["genre_name"] == genre].iloc[0]
-            print(f"{movie_id}, {genre_id.iloc[0]}")
+    # assign a sequential id for the linking table
+    movie_genre_df = movie_genre_df.reset_index(drop=True)
+    movie_genre_df["id"] = movie_genre_df.index
 
-            # use movie_id and genre_id to make new dataframe to .to_sql
-            # or movie_genre objects to add to table with sqlalchemy
-
+    # select only the columns we care about in the correct order
+    movie_genre_df = movie_genre_df[["id", "movie_id", "genre_id"]]
+    movie_genre_df.to_sql(name="movies_genres", con=engine, index=False, if_exists="replace")
 
 if __name__ == "__main__":
     setup()
