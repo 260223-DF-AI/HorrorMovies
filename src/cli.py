@@ -26,6 +26,7 @@ from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text
 from rich.syntax import Syntax
+from PIL import Image
 
 from .db import get_session
 from .db import Movie, Metadata, Rating, Finance, Genre, Movie_Genre, Collection
@@ -197,6 +198,10 @@ def presentation() -> None:
 
     clear_terminal(line_endings=0)
 
+    # open matplot of yearly movies released past 2010
+    with Image.open("..data/movies_by_year.png") as img:
+        print(f"Format: {img.format}, Size: {img.size}, Mode: {img.mode}")
+        img.show()
     
 
 

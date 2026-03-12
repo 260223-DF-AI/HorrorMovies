@@ -132,7 +132,7 @@ if __name__ == "__main__":
     print(analyze_basic_data(movies_df))
     print(analyze_column(movies_df, "budget"))
 
-    print(plot_movies(movies_df, 1989))
+    print(plot_movies(movies_df, 2010))
 
 
 
