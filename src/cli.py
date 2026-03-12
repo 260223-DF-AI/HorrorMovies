@@ -133,11 +133,9 @@ def create_df_table(df: pd.DataFrame, title:str="Data") -> Table:
 
     return table
 
-
-def presentation() -> None:
+def yearly_movie_release_count() -> None:
     """
-    A guided tour of multiple analyses that demonstrate 
-    practical use of our project's database
+    Output analysis for movies released per year
     """
 
     with get_session() as session:
@@ -158,6 +156,16 @@ def presentation() -> None:
         df.rename(columns={"release_year": "Release Year", "count_1": "Movie Count"}, inplace=True)
 
         print(create_df_table(df[df["Release Year"] > 2010], title="Movies Released After 2010 with Revenue > 0"))
+
+def presentation() -> None:
+    """
+    A guided tour of multiple analyses that demonstrate 
+    practical use of our project's database
+    """
+
+    yearly_movie_release_count()
+
+    
 
 
 
