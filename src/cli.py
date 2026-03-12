@@ -23,7 +23,11 @@ from rich.text import Text
 
 from time import sleep
 
+from .db import get_session
+from .db import Movie, Metadata, Rating, Finance, Genre, Movie_Genre, Collection
 from .validate import load_data, validate_data
+from sqlalchemy import func
+from sqlalchemy import select
 
 
 def menu() -> None:
@@ -130,17 +134,44 @@ def create_df_table(df: pd.DataFrame, title:str="Data") -> Table:
     return table
 
 
+def presentation() -> None:
+    """
+    A guided tour of multiple analyses that demonstrate 
+    practical use of our project's database
+    """
+
+    with get_session() as session:
+        # count movies by release year; group_by must include selected columns or an aggregate
+        year_extracted = func.extract("year", Movie.release_date).label("release_year")
+        
+        # form query to pass to pandas
+        data = (
+            select(year_extracted, func.count(Movie.id))
+            .join(Finance, Movie.id == Finance.movie_id)
+            .where(Finance.revenue > 0)
+            .group_by(year_extracted)
+            .order_by(year_extracted)
+        )
+
+        # retrieve dataframe holding data from query result
+        df = pd.read_sql_query(data, session.bind)
+        df.rename(columns={"release_year": "Release Year", "count_1": "Movie Count"}, inplace=True)
+
+        print(create_df_table(df[df["Release Year"] > 2010], title="Movies Released After 2010 with Revenue > 0"))
+
+
+
 
 if __name__ == "__main__":
 
-
-    df, df_rejects = load_data("data/horror_movies.csv")
+    presentation()
+    # df, df_rejects = load_data("data/horror_movies.csv")
 
     # small 4 column dataframe preview for testing
-    df_to_show: pd.DataFrame = df.head().iloc[:, :5]
-    df_to_show = df_to_show.drop(columns=["overview"])
+    # df_to_show: pd.DataFrame = df.head().iloc[:, :5]
+    # df_to_show = df_to_show.drop(columns=["overview"])
 
-    print(create_df_table(df_to_show, title="Horror Movies Dataset Sample"))
+    # print(create_df_table(df_to_show, title="Horror Movies Dataset Sample"))
 
     # menu()
 

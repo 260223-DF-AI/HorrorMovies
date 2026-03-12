@@ -25,14 +25,19 @@ class Movie(Base):
     release_date: Mapped[datetime] = mapped_column(Date)
     # rating: Mapped["Rating"] = mapped_column(ForeignKey("ratings.id"))
     # finance: Mapped["Finance"] = mapped_column(ForeignKey("finances.id"))
-    genres: Mapped[list["Genre"]] = relationship("genres", back_populates="movies")
-    # collection_id: Mapped[int] = mapped_column(ForeignKey("collections.id"))
-    collection: Mapped["Collection"] = relationship("collections", back_populates="movies")
+    # many-to-many through junction table movies_genres; use class names not table names
+    genres: Mapped[list["Genre"]] = relationship(
+        "Genre",
+        secondary="movies_genres",
+        back_populates="movies",
+    )
+    # foreign key pointing to the collections table; may be null when movie has no collection
+    collection_id: Mapped[int | None] = mapped_column(ForeignKey("collections.id"), nullable=True)
+    collection: Mapped["Collection"] = relationship("Collection", back_populates="movies")
 
 class Metadata(Base):
     __tablename__ = "metadatas"
 
-    # id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     movie_id: Mapped[int] = mapped_column(ForeignKey("movies.id"), primary_key=True)
     overview: Mapped[str] = mapped_column(Text)
     tagline: Mapped[str] = mapped_column(Text)
@@ -41,7 +46,6 @@ class Metadata(Base):
 class Rating(Base):
     __tablename__ = "ratings"
 
-    # id: Mapped[int] = mapped_column(Integer, primary_key=True)
     movie_id: Mapped[int] = mapped_column(ForeignKey("movies.id"), primary_key=True)
     popularity: Mapped[float] = mapped_column(Float)
     vote_count: Mapped[int] = mapped_column(Integer)
@@ -50,7 +54,6 @@ class Rating(Base):
 class Finance(Base):
     __tablename__ = "finances"
 
-    # id: Mapped[int] = mapped_column(Integer, primary_key=True)
     movie_id: Mapped[int] = mapped_column(ForeignKey("movies.id"), primary_key=True)
     budget: Mapped[int] = mapped_column(Integer)
     revenue: Mapped[int] = mapped_column(Integer)
@@ -61,7 +64,12 @@ class Genre(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     genre_name: Mapped[str] = mapped_column(String(14), nullable=False)
 
-    movies: Mapped[list["Movie"]] = relationship("movies", back_populates="genres")
+    # reciprocal many-to-many relationship; reference Movie class
+    movies: Mapped[list["Movie"]] = relationship(
+        "Movie",
+        secondary="movies_genres",
+        back_populates="genres",
+    )
 
 class Movie_Genre(Base):
     # Junction Table
@@ -78,7 +86,8 @@ class Collection(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     collection_name: Mapped[str] = mapped_column(String(30), nullable=False)
-    movies: Mapped[list["Movie"]] = relationship("movies", back_populates="collections")
+    # one-to-many: each collection has many movies
+    movies: Mapped[list["Movie"]] = relationship("Movie", back_populates="collection")
 
 
 def setup():
@@ -94,7 +103,8 @@ def setup():
     rejects_df.to_sql(name="horror_movies_rejects", con=engine, index=False, if_exists="replace")
     
     # Create dataframes for individual tables
-    movie_df = valid_df[["id", "original_title", "title", "original_language", "release_date"]]
+    # include collection column so we can establish FK
+    movie_df = valid_df[["id", "original_title", "title", "original_language", "release_date", "collection"]]
     metadata_df = valid_df[["id", "overview", "tagline"]]
     rating_df = valid_df[["id", "popularity", "vote_count", "vote_average"]]
     finance_df = valid_df[["id", "budget", "revenue"]]
@@ -107,9 +117,16 @@ def setup():
     genre_df = pd.DataFrame(genres_unique, columns=["genre_name"])
     genre_df["id"] = range(len(genre_df))
 
+    # build collection dataframe and keep ids to store on movies
     collections_df = valid_df[["collection", "collection_name"]]
     collections_df = collections_df.rename(columns={"collection": "collection_id"})
     collections_df = collections_df.dropna().drop_duplicates()
+
+    # rename dataframe fields to match ORM classes
+    movie_df = movie_df.rename(columns={"collection": "collection_id"})
+    metadata_df = metadata_df.rename(columns={"id": "movie_id"})
+    rating_df = rating_df.rename(columns={"id": "movie_id"})
+    finance_df = finance_df.rename(columns={"id": "movie_id"})
 
     movie_df.to_sql(name="movies", con=engine, index=False, if_exists="replace")
     metadata_df.to_sql(name="metadatas", con=engine, index=False, if_exists="replace")
