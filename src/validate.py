@@ -82,7 +82,8 @@ def validate_data(df: pd.DataFrame):
     # String standardization
     df["original_title"] = df["original_title"].str.strip()
     df["title"] = df["title"].str.strip()
-    df["original_language"] = df["original_language"].str.strip().str.lower().map(code_to_language_name)
+    # df["original_language"] = df["original_language"].str.strip().str.lower().map(code_to_language_name) #dont translate languages for saving in db
+    df["original_language"] = df["original_language"].str.strip().str.lower()
     df["genre_names"] = df["genre_names"].str.title().str.strip()
     df["collection_name"] = df["collection_name"].str.strip()
 
