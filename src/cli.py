@@ -207,6 +207,8 @@ def presentation() -> None:
         print(f"Format: {img.format}, Size: {img.size}, Mode: {img.mode}")
         img.show()
 
+    input()
+
     plot_vote_distribution()
     with Image.open("data/vote_distribution.png") as img:
         print(f"Format: {img.format}, Size: {img.size}, Mode: {img.mode}")
