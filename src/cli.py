@@ -153,11 +153,40 @@ def yearly_movie_release_count() -> None:
         # print_side_by_side(df[df["Release Year"] > 2010], "This dataframe shows the number of movies released each year.")
 
 
+def get_movie(title: str="Friday the 13th Part VIII: Jason Takes Manhattan") -> None:
+    """
+    Output basic information on a single movie
+    """
+    if not title:
+        title = "Friday the 13th Part VIII: Jason Takes Manhattan"
+    with get_session() as session:
+        query = (
+            select(Movie.title, Movie.release_date, Collection.collection_name, Metadata.tagline, Rating.vote_average, (Finance.revenue - Finance.budget).label("profit"))
+            .join(Collection, Movie.collection_id == Collection.collection_id)
+            .join(Metadata, Movie.id == Metadata.movie_id)
+            .join(Rating, Movie.id == Rating.movie_id)
+            .join(Finance, Movie.id == Finance.movie_id)
+            .where(Movie.title == title)
+        )
+
+        df = pd.read_sql_query(query, session.bind)
+        df.rename(columns={"title": "Title", "release_date": "Release Date", "collection_name": "Collection", "tagline": "Tagline", "vote_average": "Rating", "profit": "Profit"})
+
+        table: Table = create_df_table(df, f"Movie Information: {title}")
+        print(table)
+
 def presentation() -> None:
     """
     A guided tour of multiple analyses that demonstrate 
     practical use of our project's database
     """
+
+    title = ""
+    while title != "pass":
+        title = input("\"What's your favorite scary movie?\" -Ghostface, SCREAM (1996)\n")
+        if title == "pass":
+            break
+        get_movie(title)
 
     # Show yearly movie release count analysis
     clear_terminal()

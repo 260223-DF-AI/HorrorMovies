@@ -32,7 +32,7 @@ class Movie(Base):
         back_populates="movies",
     )
     # foreign key pointing to the collections table; may be null when movie has no collection
-    collection_id: Mapped[int | None] = mapped_column(ForeignKey("collections.id"), nullable=True)
+    collection_id: Mapped[int | None] = mapped_column(ForeignKey("collections.collection_id"), nullable=True)
     collection: Mapped["Collection"] = relationship("Collection", back_populates="movies")
 
 class Metadata(Base):
@@ -84,7 +84,7 @@ class Movie_Genre(Base):
 class Collection(Base):
     __tablename__ = "collections"
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    collection_id: Mapped[int] = mapped_column(Integer, primary_key=True)
     collection_name: Mapped[str] = mapped_column(String(30), nullable=False)
     # one-to-many: each collection has many movies
     movies: Mapped[list["Movie"]] = relationship("Movie", back_populates="collection")

@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 from .validate import load_data
 from .logger import log_execution
 
+
 @log_execution
 def analyze_basic_data(df: pd.DataFrame) -> dict:
     """
