@@ -133,3 +133,12 @@ if __name__ == "__main__":
     print(analyze_column(movies_df, "budget"))
 
     print(plot_movies(movies_df, 1989))
+
+
+
+import seaborn as sns
+plt.figure(figsize=(17,7))
+ax = sns.countplot(x='vote_average',  data= df)
+ax.set(title = "average vote distribution", xlabel="vote average", ylabel = "Total Count")
+plt.xticks(rotation=60)
+plt.show()
