@@ -51,7 +51,7 @@ def validate_data(df: pd.DataFrame):
     """
     # df = df.drop_duplicates()
     # Drop unused columns
-    df = df.drop(columns=["poster_path", "status", "backdrop_path", "adult"])
+    df = df.drop(columns=["poster_path", "backdrop_path", "adult"])
 
     # Try to fill missing title/original_title with original_title/title respectively
     df["title"] = df["title"].fillna(df["original_title"])
@@ -59,9 +59,11 @@ def validate_data(df: pd.DataFrame):
 
     # Fill/Drop Missing Values
     # If both original_title and title were missing, they will remain as NaN, drop
-    drop_mask = df.duplicated() | df[["id", "original_title", "title"]].isna().any(axis=1)
+    drop_mask = df.duplicated() | df[["id", "original_title", "title"]].isna().any(axis=1) | (df["status"] != "Released")
     rejects_df = df[drop_mask]
     df = df[~drop_mask]
+
+    df = df.drop(columns="status")
 
     # df = df.dropna(subset=["id", "original_title", "title"])
 
@@ -78,11 +80,11 @@ def validate_data(df: pd.DataFrame):
     df["collection"] = pd.to_numeric(df["collection"])
 
     # String standardization
-    df["original_title"] = df["original_title"].str.title().str.strip()
-    df["title"] = df["title"].str.title().str.strip()
-    df["original_language"] = df["original_language"].str.strip().map(code_to_language_name)
+    df["original_title"] = df["original_title"].str.strip()
+    df["title"] = df["title"].str.strip()
+    df["original_language"] = df["original_language"].str.strip().str.lower().map(code_to_language_name)
     df["genre_names"] = df["genre_names"].str.title().str.strip()
-    df["collection_name"] = df["collection_name"].str.title().str.strip()
+    df["collection_name"] = df["collection_name"].str.strip()
 
     return df, rejects_df
 
@@ -100,6 +102,7 @@ def code_to_language_name(code):
 # for testing
 if __name__ == "__main__":
     df, rejects = load_data("data/horror_movies.csv")
+    # print(df["status"].unique())
     print(df.shape)
     print(rejects.shape)
     # print(load_data("data/sample.json"))
