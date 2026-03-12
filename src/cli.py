@@ -34,7 +34,7 @@ from .validate import load_data, validate_data
 from sqlalchemy import func
 from sqlalchemy import select
 
-from analysis import plot_vote_distribution, plot_movies
+from .analysis import plot_vote_distribution, plot_movies
 
 
 def clear_terminal(line_endings:int=10) -> None:
@@ -181,6 +181,7 @@ def presentation() -> None:
     A guided tour of multiple analyses that demonstrate 
     practical use of our project's database
     """
+    clear_terminal()
 
     title = ""
     while title != "pass":

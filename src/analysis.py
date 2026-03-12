@@ -153,14 +153,3 @@ if __name__ == "__main__":
     # print(plot_movies(movies_df, 2010))
     plot_vote_distribution()
 
-
-<<<<<<< HEAD
-=======
-
-# import seaborn as sns
-# plt.figure(figsize=(17,7))
-# ax = sns.countplot(x='vote_average',  data= df)
-# ax.set(title = "average vote distribution", xlabel="vote average", ylabel = "Total Count")
-# plt.xticks(rotation=60)
-# plt.show()
->>>>>>> 84bba90cd6b0b2f9c6d3a1e346b3afdeb37ed5e0
