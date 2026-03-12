@@ -58,8 +58,7 @@ def analyze_column(df: pd.DataFrame, column: str) -> dict:
 
     return column_data
 
-# plot how many movies released after 2010,
-# years is the x, number of movies released is the y
+
 @log_execution
 def count_movies_by_year_after(df: pd.DataFrame, year: int) -> pd.Series:
     """
@@ -72,16 +71,17 @@ def count_movies_by_year_after(df: pd.DataFrame, year: int) -> pd.Series:
     Returns:
         Series indexed by release year with movie totals for each year
     """
+    
     # if no dates are assigned to the movie, error will raise
     if "release_date" not in df.columns:
         raise ValueError("DataFrame must contain a 'release_date' column")
 
+    # filter the movies that are released after the specified year
     release_dates = df["release_date"]
     release_years = release_dates.dropna().dt.year.astype(int)
     filtered_years = release_years[release_years > year]
 
     return filtered_years.value_counts().sort_index()
-
 
 @log_execution
 def plot_movies(df: pd.DataFrame, year: int, show_plot: bool = True) -> pd.Series:
@@ -131,4 +131,4 @@ if __name__ == "__main__":
     print(analyze_basic_data(movies_df))
     print(analyze_column(movies_df, "budget"))
 
-    print(count_movies_by_year_after(movies_df, 2010))
+    print(plot_movies(movies_df, 1989))
