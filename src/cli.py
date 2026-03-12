@@ -152,7 +152,7 @@ def yearly_movie_release_count() -> None:
         df.rename(columns={"release_year": "Release Year", "count_1": "Movie Count"}, inplace=True)
 
         # print_side_by_side(df[df["Release Year"] > 2010], "This analysis shows the number of movies released each year after 2010 that had a revenue greater than 0.")
-        print_side_by_side(df[df["Release Year"] > 2010], ("src/cli.py", (135, 141)), title="Horror Movie Release Year Totals")
+        print_side_by_side(df[df["Release Year"] > 2010], ("src/cli.py", (142, 148)), title="Horror Movie Release Year Totals")
         # print_side_by_side(df[df["Release Year"] > 2010], "This dataframe shows the number of movies released each year.")
 
 @log_execution
@@ -204,7 +204,7 @@ def presentation() -> None:
     clear_terminal(line_endings=0)
 
     # open matplot of yearly movies released past 2010
-    plot_movies(year=2010)
+    # plot_movies(year=2010)
     with Image.open("data/movies_by_year.png") as img:
         print(f"Format: {img.format}, Size: {img.size}, Mode: {img.mode}")
         img.show()
