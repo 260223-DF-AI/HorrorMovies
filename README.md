@@ -11,3 +11,8 @@ Database Explorer, summarizing and analyzing a dataset on Horror Movies through 
 
 ## Resources
 - [Horror Movies Dataset](https://www.kaggle.com/datasets/sujaykapadnis/horror-movies-dataset)
+
+## Tools
+- Pandas
+- PostgreSQL
+- [Textualize rich_ CLI](https://github.com/Textualize/rich)
