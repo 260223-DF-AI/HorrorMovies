@@ -98,7 +98,7 @@ def code_to_language_name(code):
         return lang.name if lang else "Unknown"  # fallback to original code if not found
     except Exception as e:
         logger.error(f"Exception: {e} for country code {code}")
-        return code
+        return "Unknown"
 
 # for testing
 if __name__ == "__main__":
