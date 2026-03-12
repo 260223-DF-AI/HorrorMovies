@@ -85,7 +85,7 @@ def count_movies_by_year_after(df: pd.DataFrame, year: int) -> pd.Series:
     return filtered_years.value_counts().sort_index()
 
 @log_execution
-def plot_movies(df: pd.DataFrame, year: int, show_plot: bool = True) -> pd.Series:
+def plot_movies(df: pd.DataFrame, year: int) -> pd.Series:
     """
     Plot a histogram showing how many movies were released each year after a given year.
 
@@ -107,6 +107,7 @@ def plot_movies(df: pd.DataFrame, year: int, show_plot: bool = True) -> pd.Serie
         yearly_counts.index,
         bins=range(year + 1, yearly_counts.index.max() + 2),
         weights=yearly_counts.values,
+        color="black",
         edgecolor="black",
         align="left",
         rwidth=0.9,
@@ -116,13 +117,9 @@ def plot_movies(df: pd.DataFrame, year: int, show_plot: bool = True) -> pd.Serie
     plt.ylabel("Number of Movies")
     plt.xticks(yearly_counts.index, rotation=45)
     plt.grid(axis="y", alpha=0.75)
+    plt.gcf().set_facecolor("orange")
     plt.tight_layout()
-    plt.savefig("movies_by_year.png")  # Save the plot as an image file
-
-    if show_plot:
-        plt.show()
-    else:
-        plt.close()
+    plt.savefig("data/movies_by_year.png")  # Save the plot as an image file
 
     return yearly_counts
 
@@ -136,9 +133,9 @@ if __name__ == "__main__":
 
 
 
-import seaborn as sns
-plt.figure(figsize=(17,7))
-ax = sns.countplot(x='vote_average',  data= df)
-ax.set(title = "average vote distribution", xlabel="vote average", ylabel = "Total Count")
-plt.xticks(rotation=60)
-plt.show()
+# import seaborn as sns
+# plt.figure(figsize=(17,7))
+# ax = sns.countplot(x='vote_average',  data= df)
+# ax.set(title = "average vote distribution", xlabel="vote average", ylabel = "Total Count")
+# plt.xticks(rotation=60)
+# plt.show()
