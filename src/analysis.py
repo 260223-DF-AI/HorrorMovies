@@ -3,6 +3,9 @@ For analysis-related functionality
 """
 
 import pandas as pd
+
+import matplotlib.pyplot as plt
+
 from .validate import load_data
 from .logger import log_execution
 
@@ -55,8 +58,79 @@ def analyze_column(df: pd.DataFrame, column: str) -> dict:
 
     return column_data
 
+# plot how many movies released after 2010,
+# years is the x, number of movies released is the y
+@log_execution
+def count_movies_by_year_after(df: pd.DataFrame, year: int) -> pd.Series:
+    """
+    Count movies released after a given year, grouped by release year.
+
+    Args:
+        df: DataFrame to be analyzed
+        year: Only include movies released after this year
+
+    Returns:
+        Series indexed by release year with movie totals for each year
+    """
+    if "release_date" not in df.columns:
+        raise ValueError("DataFrame must contain a 'release_date' column")
+
+    release_dates = df["release_date"]
+    if not pd.api.types.is_datetime64_any_dtype(release_dates):
+        release_dates = pd.to_datetime(release_dates, errors="coerce")
+
+    release_years = release_dates.dropna().dt.year.astype(int)
+    filtered_years = release_years[release_years > year]
+
+    return filtered_years.value_counts().sort_index()
+
+
+@log_execution
+def plot_movies(df: pd.DataFrame, year: int, show_plot: bool = True) -> pd.Series:
+    """
+    Plot a histogram showing how many movies were released each year after a given year.
+
+    Args:
+        df: Verified DataFrame to be analyzed
+        year: Only include movies released after this year
+        show_plot: Display the plot when True
+
+    Returns:
+        Series indexed by release year with movie totals for each year
+    """
+    yearly_counts = count_movies_by_year_after(df, year)
+
+    if yearly_counts.empty:
+        raise ValueError(f"No movies found after {year}")
+
+    plt.figure(figsize=(10, 6))
+    plt.hist(
+        yearly_counts.index,
+        bins=range(year + 1, yearly_counts.index.max() + 2),
+        weights=yearly_counts.values,
+        edgecolor="black",
+        align="left",
+        rwidth=0.9,
+    )
+    plt.title(f"Movies Released After {year}")
+    plt.xlabel("Release Year")
+    plt.ylabel("Number of Movies")
+    plt.xticks(yearly_counts.index, rotation=45)
+    plt.grid(axis="y", alpha=0.75)
+    plt.tight_layout()
+    plt.savefig("movies_by_year.png")  # Save the plot as an image file
+
+    if show_plot:
+        plt.show()
+    else:
+        plt.close()
+
+    return yearly_counts
 
 if __name__ == "__main__":
     # for testing purposes
-    print(analyze_basic_data(load_data("data/horror_movies.csv")))
-    print(analyze_column(load_data("data/horror_movies.csv"), "budget"))
+    movies_df, _ = load_data("data/horror_movies.csv")
+    print(analyze_basic_data(movies_df))
+    print(analyze_column(movies_df, "budget"))
+
+    print(count_movies_by_year_after(movies_df, 2010))
