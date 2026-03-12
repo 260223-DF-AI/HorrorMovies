@@ -72,13 +72,11 @@ def count_movies_by_year_after(df: pd.DataFrame, year: int) -> pd.Series:
     Returns:
         Series indexed by release year with movie totals for each year
     """
+    # if no dates are assigned to the movie, error will raise
     if "release_date" not in df.columns:
         raise ValueError("DataFrame must contain a 'release_date' column")
 
     release_dates = df["release_date"]
-    if not pd.api.types.is_datetime64_any_dtype(release_dates):
-        release_dates = pd.to_datetime(release_dates, errors="coerce")
-
     release_years = release_dates.dropna().dt.year.astype(int)
     filtered_years = release_years[release_years > year]
 
