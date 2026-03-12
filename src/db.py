@@ -3,7 +3,7 @@ import pandas as pd
 import psycopg2
 from sqlalchemy import create_engine, ForeignKey
 from sqlalchemy.types import * #replace with only necessary types
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
+from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column, relationship, sessionmaker
 from dotenv import load_dotenv
 from datetime import datetime
 import os
@@ -136,6 +136,23 @@ def setup():
     # select only the columns we care about in the correct order
     movie_genre_df = movie_genre_df[["id", "movie_id", "genre_id"]]
     movie_genre_df.to_sql(name="movies_genres", con=engine, index=False, if_exists="replace")
+
+
+def get_session() -> Session:
+    """
+    Get a SQLAlchemy session for interacting with the database
+
+    Usage:
+    with get_session() as session:
+        # interact with database via session
+    """
+    load_dotenv()
+    CS = os.getenv("CS")
+    engine = create_engine(CS)
+
+    # use sessionmaker to create session factory based on 
+    Session: Session = sessionmaker(bind=engine)
+    return Session()
 
 if __name__ == "__main__":
     setup()
