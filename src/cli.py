@@ -35,8 +35,9 @@ from sqlalchemy import func
 from sqlalchemy import select
 
 from .analysis import plot_vote_distribution, plot_movies
+from .logger import log_execution
 
-
+@log_execution
 def clear_terminal(line_endings:int=10) -> None:
     """
     Clear terminal, printing `line_endings` number of newlines
@@ -54,7 +55,7 @@ def clear_terminal(line_endings:int=10) -> None:
     if line_endings > 0:
         print("\n"*line_endings)
 
-
+@log_execution
 def create_df_table(df: pd.DataFrame, title:str="Data") -> Table:
     """
     Print `df` in a rich table.
@@ -84,7 +85,7 @@ def create_df_table(df: pd.DataFrame, title:str="Data") -> Table:
 
     return table
 
-
+@log_execution
 def print_side_by_side(df: pd.DataFrame, right_side_content: str|tuple, title: str = "") -> None:
     """
     Given dataframe to print on leftside and string to print on right side,
@@ -127,7 +128,7 @@ def print_side_by_side(df: pd.DataFrame, right_side_content: str|tuple, title: s
 
     print(layout_table)
 
-
+@log_execution
 def yearly_movie_release_count() -> None:
     """
     Output analysis for movies released per year
@@ -154,7 +155,7 @@ def yearly_movie_release_count() -> None:
         print_side_by_side(df[df["Release Year"] > 2010], ("src/cli.py", (135, 141)), title="Horror Movie Release Year Totals")
         # print_side_by_side(df[df["Release Year"] > 2010], "This dataframe shows the number of movies released each year.")
 
-
+@log_execution
 def get_movie(title: str="Friday the 13th Part VIII: Jason Takes Manhattan") -> None:
     """
     Output basic information on a single movie
@@ -176,6 +177,7 @@ def get_movie(title: str="Friday the 13th Part VIII: Jason Takes Manhattan") -> 
         table: Table = create_df_table(df, f"Movie Information: {title}")
         print(table)
 
+@log_execution
 def presentation() -> None:
     """
     A guided tour of multiple analyses that demonstrate 
@@ -202,7 +204,7 @@ def presentation() -> None:
     clear_terminal(line_endings=0)
 
     # open matplot of yearly movies released past 2010
-    
+    plot_movies(year=2010)
     with Image.open("data/movies_by_year.png") as img:
         print(f"Format: {img.format}, Size: {img.size}, Mode: {img.mode}")
         img.show()
@@ -213,9 +215,6 @@ def presentation() -> None:
     with Image.open("data/vote_distribution.png") as img:
         print(f"Format: {img.format}, Size: {img.size}, Mode: {img.mode}")
         img.show()
-    
-
-
 
 
 if __name__ == "__main__":
@@ -230,4 +229,3 @@ if __name__ == "__main__":
     # print(create_df_table(df_to_show, title="Horror Movies Dataset Sample"))
 
     # menu()
-
