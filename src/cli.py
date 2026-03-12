@@ -145,7 +145,7 @@ def presentation() -> None:
         year_extracted = func.extract("year", Movie.release_date).label("release_year")
         
         # form query to pass to pandas
-        data = (
+        query = (
             select(year_extracted, func.count(Movie.id))
             .join(Finance, Movie.id == Finance.movie_id)
             .where(Finance.revenue > 0)
@@ -154,7 +154,7 @@ def presentation() -> None:
         )
 
         # retrieve dataframe holding data from query result
-        df = pd.read_sql_query(data, session.bind)
+        df = pd.read_sql_query(query, session.bind)
         df.rename(columns={"release_year": "Release Year", "count_1": "Movie Count"}, inplace=True)
 
         print(create_df_table(df[df["Release Year"] > 2010], title="Movies Released After 2010 with Revenue > 0"))
