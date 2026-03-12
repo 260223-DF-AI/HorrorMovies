@@ -11,7 +11,11 @@ Rich reference material to use:
     https://github.com/Textualize/rich/blob/master/examples/table_movie.py
 """
 
+import os
 import pandas as pd
+import platform
+from time import sleep
+
 from rich import print
 from rich.align import Align
 from rich.columns import Columns
@@ -23,13 +27,29 @@ from rich.table import Table
 from rich.text import Text
 from rich.syntax import Syntax
 
-from time import sleep
-
 from .db import get_session
 from .db import Movie, Metadata, Rating, Finance, Genre, Movie_Genre, Collection
 from .validate import load_data, validate_data
 from sqlalchemy import func
 from sqlalchemy import select
+
+
+def clear_terminal(line_endings:int=10) -> None:
+    """
+    Clear terminal, printing `line_endings` number of newlines
+    after clearing terminal.
+    """
+    # Check the operating system name
+    if platform.system() == "Windows":
+        # Command for Windows
+        os.system('cls')
+    else:
+        # Command for Linux and macOS
+        os.system('clear')
+
+    # start terminal output a bit down
+    if line_endings > 0:
+        print("\n"*line_endings)
 
 
 def create_df_table(df: pd.DataFrame, title:str="Data") -> Table:
@@ -62,10 +82,10 @@ def create_df_table(df: pd.DataFrame, title:str="Data") -> Table:
     return table
 
 
-def print_side_by_side(df: pd.DataFrame, right_side_content: str|tuple) -> None:
+def print_side_by_side(df: pd.DataFrame, right_side_content: str|tuple, title: str = "") -> None:
     """
     Given dataframe to print on leftside and string to print on right side,
-    print data side by side
+    print data side by side. Optionally display a title above the layout.
     """
 
     def get_right_side_content() -> Text|Syntax:
@@ -91,15 +111,19 @@ def print_side_by_side(df: pd.DataFrame, right_side_content: str|tuple) -> None:
     # create table for left side
     table: Table = create_df_table(df)
 
-    
-
     # use a table for side-by-side layout with vertical alignment
-    layout_table: Table = Table(show_header=False, show_footer=False, box=None, padding=(0, 2))
+    # display title if provided
+    if title:
+        layout_table: Table = Table(show_header=False, show_footer=False, box=None, padding=(0, 2), title=title, title_style="bold #FCB8EC")
+    else:
+        layout_table: Table = Table(show_header=False, show_footer=False, box=None, padding=(0, 2))
+    
     layout_table.add_column(no_wrap=False, vertical="Center")
     layout_table.add_column(no_wrap=False, vertical="Center")
     layout_table.add_row(table, right_side_content)
 
     print(layout_table)
+
 
 def yearly_movie_release_count() -> None:
     """
@@ -124,8 +148,31 @@ def yearly_movie_release_count() -> None:
         df.rename(columns={"release_year": "Release Year", "count_1": "Movie Count"}, inplace=True)
 
         # print_side_by_side(df[df["Release Year"] > 2010], "This analysis shows the number of movies released each year after 2010 that had a revenue greater than 0.")
-        print_side_by_side(df[df["Release Year"] > 2010], ("src/cli.py", (100, 112)))
+        print_side_by_side(df[df["Release Year"] > 2010], ("src/cli.py", (135, 141)), title="Horror Movie Release Year Totals")
+        # print_side_by_side(df[df["Release Year"] > 2010], "This dataframe shows the number of movies released each year.")
 
+
+def get_movie(title: str="Friday the 13th Part VIII: Jason Takes Manhattan") -> None:
+    """
+    Output basic information on a single movie
+    """
+    if not title:
+        title = "Friday the 13th Part VIII: Jason Takes Manhattan"
+    with get_session() as session:
+        query = (
+            select(Movie.title, Movie.release_date, Collection.collection_name, Metadata.tagline, Rating.vote_average, (Finance.revenue - Finance.budget).label("profit"))
+            .join(Collection, Movie.collection_id == Collection.collection_id)
+            .join(Metadata, Movie.id == Metadata.movie_id)
+            .join(Rating, Movie.id == Rating.movie_id)
+            .join(Finance, Movie.id == Finance.movie_id)
+            .where(Movie.title == title)
+        )
+
+        df = pd.read_sql_query(query, session.bind)
+        df.rename(columns={"title": "Title", "release_date": "Release Date", "collection_name": "Collection", "tagline": "Tagline", "vote_average": "Rating", "profit": "Profit"})
+
+        table: Table = create_df_table(df, f"Movie Information: {title}")
+        print(table)
 
 def get_movie(title: str="Friday the 13th Part VIII: Jason Takes Manhattan") -> None:
     """
@@ -162,7 +209,16 @@ def presentation() -> None:
             break
         get_movie(title)
 
+    # Show yearly movie release count analysis
+    clear_terminal()
     yearly_movie_release_count()
+    input() # pause execution till hitting key
+
+    clear_terminal()
+    # yearly_movie_release_count()
+    # input()
+
+    clear_terminal(line_endings=0)
 
     
 
