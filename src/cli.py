@@ -18,8 +18,10 @@ from rich.columns import Columns
 from rich.console import Console, Group
 from rich.layout import Layout
 from rich.live import Live
+from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text
+from rich.syntax import Syntax
 
 from time import sleep
 
@@ -28,80 +30,6 @@ from .db import Movie, Metadata, Rating, Finance, Genre, Movie_Genre, Collection
 from .validate import load_data, validate_data
 from sqlalchemy import func
 from sqlalchemy import select
-
-
-def menu() -> None:
-    """
-    Enters the initial command line menu 
-    """
-
-    console = Console(width=80, style="#B8FCC8")
-    # console.rule("[bold u]Horror Movies Data Analysis[/]", style="#FCB8EC")
-
-    options: list[str] = [
-        "Display sample dataframe",
-        "First test option",
-        "Second test option"
-    ]
-
-    
-    columns: Columns = Columns(width=40, align="center", column_first=True)
-    columns.add_renderable("[bold u]Options[/]")
-
-    for index, option in enumerate(options, 1):
-        columns.add_renderable(f"[b]{index}.[/] {option}")
-
-    layout: Layout = get_menu_layout()
-    console.print(layout)
-    layout["options"].update(Align(columns, vertical="middle"))
-    # console.print(layout)
-    # print(layout)
-
-    # with Live(layout, screen=True) as live:
-    #     try:
-    #         while True:
-    #             sleep(1)
-    #     except KeyboardInterrupt:
-    #         exit()
-
-
-
-
-def get_menu_layout() -> Layout:
-    """
-    Construct main layout for initial menu.
-    Layout top: "header"
-    Layouts middle: "options" for option list and "extra" for extra unassigned space
-    Layouts bottom: "footer"
-    """
-
-    layout: Layout = Layout()
-
-    # layout of three rows in a column
-    layout.split(
-        Layout(name="header", size=2),
-        Layout(ratio=1, name="main"),
-        # Layout(size=10, name="footer")
-    )
-
-    layout["header"].update(Align.center(Text("Horror Movies Data Analysis", style="#FCB8EC bold underline")))
-
-    # middle row itself is made of two columns
-    layout["main"].split_row(Layout(name="options"), Layout(name="extra", ratio=2))
-
-    # add text to the right side space
-    layout["extra"].update(
-        Align.center(
-            Text(
-                f"This is some extra unused space. For demonstration",
-                justify="center",
-                style="u"
-            ),
-            vertical="middle"
-        )
-    )
-
-    return layout
 
 
 def create_df_table(df: pd.DataFrame, title:str="Data") -> Table:
@@ -133,6 +61,46 @@ def create_df_table(df: pd.DataFrame, title:str="Data") -> Table:
 
     return table
 
+
+def print_side_by_side(df: pd.DataFrame, right_side_content: str|tuple) -> None:
+    """
+    Given dataframe to print on leftside and string to print on right side,
+    print data side by side
+    """
+
+    def get_right_side_content() -> Text|Syntax:
+        if isinstance(right_side_content, str):
+            # create text for right side
+            text: Text = Text(right_side_content, justify="center")
+            text_aligned = Align.center(text, vertical="middle")
+            return text_aligned
+
+        # if not string, it's a tuple of filename & range of code lines to showcase
+        else:
+            filename, line_range = right_side_content
+            syntax = Syntax.from_path(
+                filename,
+                line_numbers=True,
+                line_range=(line_range[0], line_range[1]),
+                # highlight_lines={190} # Highlight specific line within the range
+            )
+            return syntax
+        
+    right_side_content = get_right_side_content()
+
+    # create table for left side
+    table: Table = create_df_table(df)
+
+    
+
+    # use a table for side-by-side layout with vertical alignment
+    layout_table: Table = Table(show_header=False, show_footer=False, box=None, padding=(0, 2))
+    layout_table.add_column(no_wrap=False, vertical="Center")
+    layout_table.add_column(no_wrap=False, vertical="Center")
+    layout_table.add_row(table, right_side_content)
+
+    print(layout_table)
+
 def yearly_movie_release_count() -> None:
     """
     Output analysis for movies released per year
@@ -155,7 +123,9 @@ def yearly_movie_release_count() -> None:
         df = pd.read_sql_query(data, session.bind)
         df.rename(columns={"release_year": "Release Year", "count_1": "Movie Count"}, inplace=True)
 
-        print(create_df_table(df[df["Release Year"] > 2010], title="Movies Released After 2010 with Revenue > 0"))
+        # print_side_by_side(df[df["Release Year"] > 2010], "This analysis shows the number of movies released each year after 2010 that had a revenue greater than 0.")
+        print_side_by_side(df[df["Release Year"] > 2010], ("src/cli.py", (100, 112)))
+
 
 def presentation() -> None:
     """
