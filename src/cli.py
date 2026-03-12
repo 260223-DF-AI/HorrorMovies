@@ -34,6 +34,8 @@ from .validate import load_data, validate_data
 from sqlalchemy import func
 from sqlalchemy import select
 
+from analysis import plot_vote_distribution, plot_movies
+
 
 def clear_terminal(line_endings:int=10) -> None:
     """
@@ -199,7 +201,13 @@ def presentation() -> None:
     clear_terminal(line_endings=0)
 
     # open matplot of yearly movies released past 2010
-    with Image.open("..data/movies_by_year.png") as img:
+    
+    with Image.open("data/movies_by_year.png") as img:
+        print(f"Format: {img.format}, Size: {img.size}, Mode: {img.mode}")
+        img.show()
+
+    plot_vote_distribution()
+    with Image.open("data/vote_distribution.png") as img:
         print(f"Format: {img.format}, Size: {img.size}, Mode: {img.mode}")
         img.show()
     

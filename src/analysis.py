@@ -2,10 +2,13 @@
 For analysis-related functionality
 """
 
-import pandas as pd
-
 import matplotlib.pyplot as plt
+import pandas as pd
+import seaborn as sns
+from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column, relationship, sessionmaker
 
+
+from .db import get_session, Movie, Rating
 from .validate import load_data
 from .logger import log_execution
 
@@ -126,19 +129,31 @@ def plot_movies(df: pd.DataFrame, year: int, show_plot: bool = True) -> pd.Serie
 
     return yearly_counts
 
+
+def plot_vote_distribution():
+    """
+    Plot histogram showing vote average distribution
+    """
+
+    with get_session() as session:
+        # get df with all movies and their ratings
+        query = session.query(Movie, Rating).join(Rating, Movie.id == Rating.movie_id).where(Rating.vote_average > 0)
+        df = pd.read_sql_query(query.statement, session.bind)
+
+    plt.figure(figsize=(17,7))
+    ax = sns.countplot(x='vote_average',  data= df)
+    ax.set(title = "average vote distribution", xlabel="vote average", ylabel = "Total Count")
+    plt.xticks(rotation=60)
+    plt.savefig("data/vote_distribution.png")
+
+
 if __name__ == "__main__":
     # for testing purposes
-    movies_df, _ = load_data("data/horror_movies.csv")
-    print(analyze_basic_data(movies_df))
-    print(analyze_column(movies_df, "budget"))
+    # movies_df, _ = load_data("data/horror_movies.csv")
+    # print(analyze_basic_data(movies_df))
+    # print(analyze_column(movies_df, "budget"))
 
-    print(plot_movies(movies_df, 2010))
+    # print(plot_movies(movies_df, 2010))
+    plot_vote_distribution()
 
 
-
-import seaborn as sns
-plt.figure(figsize=(17,7))
-ax = sns.countplot(x='vote_average',  data= df)
-ax.set(title = "average vote distribution", xlabel="vote average", ylabel = "Total Count")
-plt.xticks(rotation=60)
-plt.show()
