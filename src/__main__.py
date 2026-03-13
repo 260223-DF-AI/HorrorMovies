@@ -103,11 +103,11 @@ def presentation() -> None:
     clear_terminal()
 
     movies_df, _ = load_data("data/horror_movies.csv")
-    print("[bold orange i]What year do we want to start seeing the highest grossing horror films from?[/]")
+    print(f"[bold #ff9922 i]What year do we want to start seeing the highest grossing horror films from?[/]")
     input_year = input()
     highest_gross_histogram(movies_df, int(input_year))
     with Image.open("data/highest_grossing_by_year.png") as img:
-        print(f"[bold orange i]Opening histogram displaying highest grossing movies by year![/]")
+        print(f"[bold #ff9922 i]Opening histogram displaying highest grossing movies by year![/]")
         img.show()
 
     input()
