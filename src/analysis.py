@@ -173,7 +173,7 @@ def highest_gross_histogram(df: pd.DataFrame, year: int) -> None:
             ha="center",
             va="bottom",
             rotation=90,
-            fontsize=10,
+            fontsize=8,
         ).set_path_effects([PathEffects.withStroke(linewidth=3, foreground="black")])
 
     plt.title(f"Highest Grossing Film Per Year After {year}")
