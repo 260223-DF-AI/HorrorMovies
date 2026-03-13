@@ -5,6 +5,8 @@ For analysis-related functionality
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
+from sqlalchemy import func
+from sqlalchemy import select
 from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column, relationship, sessionmaker
 
 
@@ -64,7 +66,7 @@ def analyze_column(df: pd.DataFrame, column: str) -> dict:
 
 
 @log_execution
-def count_movies_by_year_after(df: pd.DataFrame, year: int) -> pd.Series:
+def count_movies_by_year_after(df: pd.DataFrame, year: int) -> pd.DataFrame:
     """
     Count movies released after a given year, grouped by release year.
 
@@ -73,33 +75,35 @@ def count_movies_by_year_after(df: pd.DataFrame, year: int) -> pd.Series:
         year: Only include movies released after this year
 
     Returns:
-        Series indexed by release year with movie totals for each year
+        DataFrame indexed by release year with movie count for each year
     """
     
-    # if no dates are assigned to the movie, error will raise
-    if "release_date" not in df.columns:
-        raise ValueError("DataFrame must contain a 'release_date' column")
+    with get_session() as session:
+        # extract year from release date
+        year_extracted = func.extract("year", Movie.release_date).label("release_year")
 
-    # filter the movies that are released after the specified year
-    release_dates = df["release_date"]
-    release_years = release_dates.dropna().dt.year.astype(int)
-    filtered_years = release_years[release_years > year]
+        # query retrieves year & movie release counts
+        query = (
+            select(year_extracted, func.count(Movie.id))
+            .where(year_extracted > year)  # only include movies released after specified year
+            .group_by(year_extracted)
+            .order_by(year_extracted)
+        )
+        df = pd.read_sql_query(query, session.bind)
+        df.rename(columns={"release_year": "Release Year", "count_1": "Movie Count"}, inplace=True)
+        return df.set_index("Release Year")["Movie Count"]
 
-    return filtered_years.value_counts().sort_index()
 
 @log_execution
-def plot_movies(df: pd.DataFrame, year: int) -> pd.Series:
+def plot_movies(df: pd.DataFrame, year: int) -> None:
     """
     Plot a histogram showing how many movies were released each year after a given year.
 
     Args:
         df: Verified DataFrame to be analyzed
         year: Only include movies released after this year
-        show_plot: Display the plot when True
-
-    Returns:
-        Series indexed by release year with movie totals for each year
     """
+    
     yearly_counts = count_movies_by_year_after(df, year)
 
     if yearly_counts.empty:
@@ -108,7 +112,7 @@ def plot_movies(df: pd.DataFrame, year: int) -> pd.Series:
     plt.figure(figsize=(10, 6))
     plt.hist(
         yearly_counts.index,
-        bins=range(year + 1, yearly_counts.index.max() + 2),
+        bins=range(year + 1, int(yearly_counts.index.max()) + 2),
         weights=yearly_counts.values,
         color="black",
         edgecolor="black",
@@ -123,8 +127,6 @@ def plot_movies(df: pd.DataFrame, year: int) -> pd.Series:
     plt.gcf().set_facecolor("orange")
     plt.tight_layout()
     plt.savefig("data/movies_by_year.png")  # Save the plot as an image file
-
-    return yearly_counts
 
 
 def plot_vote_distribution():
@@ -146,10 +148,10 @@ def plot_vote_distribution():
 
 if __name__ == "__main__":
     # for testing purposes
-    # movies_df, _ = load_data("data/horror_movies.csv")
-    # print(analyze_basic_data(movies_df))
-    # print(analyze_column(movies_df, "budget"))
+    movies_df, _ = load_data("data/horror_movies.csv")
+    print(analyze_basic_data(movies_df))
+    print(analyze_column(movies_df, "budget"))
 
-    # print(plot_movies(movies_df, 2010))
+    plot_movies(movies_df, 2000)
     plot_vote_distribution()
 
