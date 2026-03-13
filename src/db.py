@@ -1,6 +1,5 @@
 """Interacting with PostgreSQL"""
 import pandas as pd
-import psycopg2
 from sqlalchemy import create_engine, ForeignKey
 from sqlalchemy.types import * #replace with only necessary types
 from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column, relationship, sessionmaker

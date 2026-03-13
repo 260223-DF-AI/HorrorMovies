@@ -6,8 +6,6 @@ import matplotlib.pyplot as plt # type: ignore
 import pandas as pd
 from sqlalchemy import func
 from sqlalchemy import select
-from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column, relationship, sessionmaker
-
 
 from .db import get_session, Movie, Rating
 from .validate import load_data
