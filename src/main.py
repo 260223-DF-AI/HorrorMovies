@@ -36,7 +36,7 @@ def yearly_movie_release_count() -> None:
         df = pd.read_sql_query(query, session.bind)
         df.rename(columns={"release_year": "Release Year", "count_1": "Movie Count"}, inplace=True)
 
-        print_side_by_side(df[df["Release Year"] > 2010], ("src/main.py", (21, 35)), title="Horror Movie Release Year Totals")
+        print_side_by_side(df[df["Release Year"] > 2010], ("src/main.py", (22, 36)), title="Horror Movie Release Year Totals")
 
 @log_execution
 def get_movie(title: str="Friday the 13th Part VIII: Jason Takes Manhattan") -> None:
@@ -103,7 +103,8 @@ def presentation() -> None:
     clear_terminal()
 
     movies_df, _ = load_data("data/horror_movies.csv")
-    input_year = input("What year do we want to start seeing the highest grossing horror films from? ")
+    print("[bold orange i]What year do we want to start seeing the highest grossing horror films from?[/]")
+    input_year = input()
     highest_gross_histogram(movies_df, int(input_year))
     with Image.open("data/highest_grossing_by_year.png") as img:
         print(f"[bold orange i]Opening histogram displaying highest grossing movies by year![/]")
