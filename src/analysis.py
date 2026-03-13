@@ -5,11 +5,8 @@ For analysis-related functionality
 import matplotlib.pyplot as plt
 import matplotlib.patheffects as PathEffects
 import pandas as pd
-import seaborn as sns
 from sqlalchemy import func
 from sqlalchemy import select
-from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column, relationship, sessionmaker
-
 
 from .db import get_session, Movie, Rating, Finance
 from .validate import load_data
@@ -198,10 +195,17 @@ def plot_vote_distribution():
         query = session.query(Movie, Rating).join(Rating, Movie.id == Rating.movie_id).where(Rating.vote_average > 0)
         df = pd.read_sql_query(query.statement, session.bind)
 
+    all_values = pd.Series([round(x * 0.1, 1) for x in range(0, 101)])
+    counts = df["vote_average"].value_counts()
+    full_counts = all_values.map(counts).fillna(0)
     plt.figure(figsize=(17,7))
-    ax = sns.countplot(x='vote_average',  data= df)
-    ax.set(title = "average vote distribution", xlabel="vote average", ylabel = "Total Count")
-    plt.xticks(rotation=60)
+    plt.gcf().set_facecolor("orange")
+    ax = plt.bar(all_values, full_counts, width=0.08, color="black", edgecolor="black")
+    ax = plt.gca()
+    ticks = [x for x in all_values if x % 0.5 == 0]
+    ax.set_xticks(ticks)
+    ax.set_xticklabels(ticks)
+    ax.set(title = "Average Vote Distribution", xlabel="Vote Average", ylabel = "Total Count")
     plt.savefig("data/vote_distribution.png")
 
 
