@@ -14,27 +14,27 @@ Rich reference material to use:
 import os
 import pandas as pd
 import platform
-from time import sleep
+# from time import sleep
 
 from rich import print
 from rich.align import Align
-from rich.columns import Columns
-from rich.console import Console, Group
-from rich.layout import Layout
-from rich.live import Live
-from rich.panel import Panel
+# from rich.columns import Columns
+# from rich.console import Console, Group
+# from rich.layout import Layout
+# from rich.live import Live
+# from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text
 from rich.syntax import Syntax
 from PIL import Image
 
 from .db import get_session
-from .db import Movie, Metadata, Rating, Finance, Genre, Movie_Genre, Collection
-from .validate import load_data, validate_data
+from .db import Movie, Metadata, Rating, Finance#, Genre, Movie_Genre, Collection
+# from .validate import load_data, validate_data
 from sqlalchemy import func
 from sqlalchemy import select
 
-from .analysis import plot_vote_distribution, plot_movies
+# from .analysis import plot_vote_distribution, plot_movies
 from .logger import log_execution
 
 @log_execution
@@ -208,7 +208,7 @@ def presentation() -> None:
     input()
     clear_terminal()
 
-    plot_vote_distribution()
+    # plot_vote_distribution()
     with Image.open("data/vote_distribution.png") as img:
         print(f"[bold green i]Opening bar graph displaying the vote distribution among the dataset's ratings![/]")
         img.show()
