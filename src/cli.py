@@ -38,7 +38,7 @@ from .analysis import plot_vote_distribution, plot_movies
 from .logger import log_execution
 
 @log_execution
-def clear_terminal(line_endings:int=10) -> None:
+def clear_terminal(line_endings:int=0) -> None:
     """
     Clear terminal, printing `line_endings` number of newlines
     after clearing terminal.
@@ -151,9 +151,7 @@ def yearly_movie_release_count() -> None:
         df = pd.read_sql_query(query, session.bind)
         df.rename(columns={"release_year": "Release Year", "count_1": "Movie Count"}, inplace=True)
 
-        # print_side_by_side(df[df["Release Year"] > 2010], "This analysis shows the number of movies released each year after 2010 that had a revenue greater than 0.")
-        print_side_by_side(df[df["Release Year"] > 2010], ("src/cli.py", (142, 148)), title="Horror Movie Release Year Totals")
-        # print_side_by_side(df[df["Release Year"] > 2010], "This dataframe shows the number of movies released each year.")
+        print_side_by_side(df[df["Release Year"] > 2010], ("src/cli.py", (137, 148)), title="Horror Movie Release Year Totals")
 
 @log_execution
 def get_movie(title: str="Friday the 13th Part VIII: Jason Takes Manhattan") -> None:
@@ -187,45 +185,33 @@ def presentation() -> None:
 
     title = ""
     while title != "pass":
-        title = input("\"What's your favorite scary movie?\" -Ghostface, SCREAM (1996)\n")
+        print("What's your favorite [bold red underline]scary[/] movie?\" -[bold dim]Ghostface[/], [i]SCREAM[/] (1996)")
+        title = input()
         if title == "pass":
             break
         get_movie(title)
 
     # Show yearly movie release count analysis
-    clear_terminal()
+    clear_terminal(line_endings=10)
     yearly_movie_release_count()
     input() # pause execution till hitting key
 
     clear_terminal()
-    # yearly_movie_release_count()
-    # input()
-
-    clear_terminal(line_endings=0)
 
     # open matplot of yearly movies released past 2010
     # plot_movies(year=2010)
     with Image.open("data/movies_by_year.png") as img:
-        print(f"Format: {img.format}, Size: {img.size}, Mode: {img.mode}")
+        print(f"[bold #ad97e3 i]Opening graph displaying total horror movies released each year since 2010![/]")
         img.show()
 
     input()
+    clear_terminal()
 
     plot_vote_distribution()
     with Image.open("data/vote_distribution.png") as img:
-        print(f"Format: {img.format}, Size: {img.size}, Mode: {img.mode}")
+        print(f"[bold green i]Opening bar graph displaying the vote distribution among the dataset's ratings![/]")
         img.show()
 
 
 if __name__ == "__main__":
-
     presentation()
-    # df, df_rejects = load_data("data/horror_movies.csv")
-
-    # small 4 column dataframe preview for testing
-    # df_to_show: pd.DataFrame = df.head().iloc[:, :5]
-    # df_to_show = df_to_show.drop(columns=["overview"])
-
-    # print(create_df_table(df_to_show, title="Horror Movies Dataset Sample"))
-
-    # menu()

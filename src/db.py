@@ -21,10 +21,7 @@ class Movie(Base):
     original_title: Mapped[str] = mapped_column(String(50), nullable=False)
     title: Mapped[str] = mapped_column(String(50), nullable=False)
     original_language: Mapped[str] = mapped_column(String(2), nullable=False)
-    # metadata: Mapped["Metadata"] = mapped_column(ForeignKey("metadatas.id"))
     release_date: Mapped[datetime] = mapped_column(Date)
-    # rating: Mapped["Rating"] = mapped_column(ForeignKey("ratings.id"))
-    # finance: Mapped["Finance"] = mapped_column(ForeignKey("finances.id"))
     # many-to-many through junction table movies_genres; use class names not table names
     genres: Mapped[list["Genre"]] = relationship(
         "Genre",
@@ -64,7 +61,6 @@ class Genre(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     genre_name: Mapped[str] = mapped_column(String(14), nullable=False)
 
-    # reciprocal many-to-many relationship; reference Movie class
     movies: Mapped[list["Movie"]] = relationship(
         "Movie",
         secondary="movies_genres",
@@ -79,14 +75,11 @@ class Movie_Genre(Base):
     movie_id: Mapped[int] = mapped_column(ForeignKey("movies.id"))
     genre_id: Mapped[int] = mapped_column(ForeignKey("genres.id"))
 
-    # ??? do we need relationshps defined here? do we even need this class?
-
 class Collection(Base):
     __tablename__ = "collections"
 
     collection_id: Mapped[int] = mapped_column(Integer, primary_key=True)
     collection_name: Mapped[str] = mapped_column(String(30), nullable=False)
-    # one-to-many: each collection has many movies
     movies: Mapped[list["Movie"]] = relationship("Movie", back_populates="collection")
 
 
@@ -94,6 +87,7 @@ def setup():
     """
     Setup connection to PostgreSQL database using SQLAlchemy
     """
+    # initialize connection to postgres db
     load_dotenv()
     CS = os.getenv("CS")
     engine = create_engine(CS)
@@ -128,6 +122,7 @@ def setup():
     rating_df = rating_df.rename(columns={"id": "movie_id"})
     finance_df = finance_df.rename(columns={"id": "movie_id"})
 
+    # write dataframes to respective databases!
     movie_df.to_sql(name="movies", con=engine, index=False, if_exists="replace")
     metadata_df.to_sql(name="metadatas", con=engine, index=False, if_exists="replace")
     rating_df.to_sql(name="ratings", con=engine, index=False, if_exists="replace")
@@ -167,7 +162,7 @@ def get_session() -> Session:
     CS = os.getenv("CS")
     engine = create_engine(CS)
 
-    # use sessionmaker to create session factory based on 
+    # use sessionmaker to create session factory based on engine
     Session: Session = sessionmaker(bind=engine)
     return Session()
 
