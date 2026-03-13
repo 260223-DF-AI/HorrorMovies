@@ -99,5 +99,13 @@ def presentation() -> None:
 
     input()
 
+    clear_terminal()
+    with Image.open("data/vote_distribution.png") as img:
+        print(f"[bold orange i]Opening histogram displaying highest grossing movies by year![/]")
+        img.show()
+
+    input()
+
+
 if __name__ == "__main__":
     presentation()
