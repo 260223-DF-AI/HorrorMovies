@@ -104,11 +104,13 @@ def plot_movies(df: pd.DataFrame, year: int) -> None:
         year: Only include movies released after this year
     """
     
+    # query the data from the database
     yearly_counts = count_movies_by_year_after(df, year)
 
     if yearly_counts.empty:
         raise ValueError(f"No movies found after {year}")
 
+    # begin plotting histogram
     plt.figure(figsize=(10, 6))
     plt.hist(
         yearly_counts.index,
