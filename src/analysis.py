@@ -2,7 +2,7 @@
 For analysis-related functionality
 """
 
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt # type: ignore
 import pandas as pd
 from sqlalchemy import func
 from sqlalchemy import select

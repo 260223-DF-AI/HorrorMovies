@@ -26,7 +26,7 @@ from rich.align import Align
 from rich.table import Table
 from rich.text import Text
 from rich.syntax import Syntax
-from PIL import Image
+from PIL import Image # type: ignore
 
 from .db import get_session
 from .db import Movie, Metadata, Rating, Finance#, Genre, Movie_Genre, Collection
