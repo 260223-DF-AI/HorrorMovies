@@ -6,10 +6,11 @@ from sqlalchemy import func, select
 from rich import print
 from rich.table import Table
 
+from .validate import load_data
 from .logger import log_execution
 from .cli import clear_terminal, create_df_table, print_side_by_side
 from .db import Movie, Metadata, Rating, Finance, get_session
-# from .analysis import plot_vote_distribution, plot_movies
+from .analysis import highest_gross_histogram
 
 
 @log_execution
@@ -101,8 +102,10 @@ def presentation() -> None:
 
     clear_terminal()
 
-    input("What year do we want to start seeing the highest grossing horror films from? ")
-    with Image.open("data/vote_distribution.png") as img:
+    movies_df, _ = load_data("data/horror_movies.csv")
+    input_year = input("What year do we want to start seeing the highest grossing horror films from? ")
+    highest_gross_histogram(movies_df, int(input_year))
+    with Image.open("data/highest_grossing_by_year.png") as img:
         print(f"[bold orange i]Opening histogram displaying highest grossing movies by year![/]")
         img.show()
 

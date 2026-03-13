@@ -134,6 +134,7 @@ def highest_gross_histogram(df: pd.DataFrame, year: int) -> None:
     """
     Output histogram of highest grossing movies by year, starting from a specified year.
     """
+    
     with get_session() as session:
         release_year = func.extract("year", Movie.release_date).label("release_year")
 
