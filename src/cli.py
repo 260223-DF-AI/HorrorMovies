@@ -135,10 +135,10 @@ def yearly_movie_release_count() -> None:
     """
 
     with get_session() as session:
-        # count movies by release year; group_by must include selected columns or an aggregate
+        # extract year from release date
         year_extracted = func.extract("year", Movie.release_date).label("release_year")
         
-        # form query to pass to pandas
+        # query retrieves year & movie release counts
         query = (
             select(year_extracted, func.count(Movie.id))
             .join(Finance, Movie.id == Finance.movie_id)
