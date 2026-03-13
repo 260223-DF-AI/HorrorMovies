@@ -67,11 +67,11 @@ def presentation() -> None:
     practical use of our project's database
     """
     clear_terminal()
-    clear_terminal()
+    clear_terminal(line_endings=10)
 
     title = ""
     while title != "pass":
-        print("What's your favorite [bold red underline]scary[/] movie?\" -[bold dim]Ghostface[/], [i]SCREAM[/] (1996)")
+        print("[white]\"What's your favorite [bold red underline]scary[/] movie?\"[/] -[bold dim]Ghostface[/], [i]SCREAM[/] (1996)")
         title = input()
         if title == "pass":
             break
@@ -82,7 +82,7 @@ def presentation() -> None:
     yearly_movie_release_count()
     input() # pause execution till hitting key
 
-    clear_terminal()
+    clear_terminal(line_endings=10)
 
     # open matplot of yearly movies released past 2010
     # plot_movies(year=2010)
@@ -91,7 +91,7 @@ def presentation() -> None:
         img.show()
 
     input()
-    clear_terminal()
+    clear_terminal(line_endings=10)
 
     # plot_vote_distribution()
     with Image.open("data/vote_distribution.png") as img:
@@ -100,7 +100,7 @@ def presentation() -> None:
 
     input()
 
-    clear_terminal()
+    clear_terminal(line_endings=10)
 
     movies_df, _ = load_data("data/horror_movies.csv")
     print(f"[bold #ff9922 i]What year do we want to start seeing the highest grossing horror films from?[/]")
@@ -110,6 +110,12 @@ def presentation() -> None:
         print(f"[bold #ff9922 i]Opening histogram displaying highest grossing movies by year![/]")
         img.show()
 
+    input()
+
+    clear_terminal(line_endings=10)
+
+    print(f"[white]\"[bold #ff0000 underline]Everybody's[/] a suspect!\"[white] -[bold dim]Randy[/], [i]SCREAM[/] (1996)")
+    
     input()
 
 
