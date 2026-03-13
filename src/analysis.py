@@ -178,7 +178,7 @@ def highest_gross_histogram(df: pd.DataFrame, year: int) -> None:
 
     plt.title(f"Highest Grossing Film Per Year After {year}")
     plt.xlabel("Release Year")
-    plt.ylabel("Revenue")
+    plt.ylabel("Revenue (per hundred million)")
     plt.xticks(top_movies["release_year"], rotation=45)
     plt.grid(axis="y", alpha=0.75)
     plt.gcf().set_facecolor("orange")
