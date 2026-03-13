@@ -3,6 +3,7 @@ For analysis-related functionality
 """
 
 import matplotlib.pyplot as plt
+import matplotlib.patheffects as PathEffects
 import pandas as pd
 import seaborn as sns
 from sqlalchemy import func
@@ -10,7 +11,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column, relationship, sessionmaker
 
 
-from .db import get_session, Movie, Rating
+from .db import get_session, Movie, Rating, Finance
 from .validate import load_data
 from .logger import log_execution
 
@@ -131,6 +132,62 @@ def plot_movies(df: pd.DataFrame, year: int) -> None:
     plt.savefig("data/movies_by_year.png")  # Save the plot as an image file
 
 
+@log_execution
+def highest_gross_histogram(df: pd.DataFrame, year: int) -> None:
+    """
+    Output histogram of highest grossing movies by year, starting from a specified year.
+    """
+    with get_session() as session:
+        release_year = func.extract("year", Movie.release_date).label("release_year")
+
+        query = (
+            select(Movie.title, release_year, Finance.revenue)
+            .join(Finance, Movie.id == Finance.movie_id)
+            .where(release_year > year)
+            .where(Finance.revenue > 0)
+        )
+
+        df = pd.read_sql_query(query, session.bind)
+
+    if df.empty:
+        raise ValueError(f"No revenue data found after {year}")
+
+    # keep exactly one movie per year: the highest-grossing entry in that year
+    top_movies = df.loc[df.groupby("release_year")["revenue"].idxmax()].copy()
+    top_movies["release_year"] = top_movies["release_year"].astype(int)
+    top_movies = top_movies.sort_values("release_year")
+
+    plt.figure(figsize=(10, 6))
+    bars = plt.bar(
+        top_movies["release_year"],
+        top_movies["revenue"],
+        color="black",
+        edgecolor="black",
+    )
+
+    for bar, title in zip(bars, top_movies["title"]):
+        plt.text(
+            bar.get_x() + (bar.get_width() / 2),
+            bar.get_y(),
+            title,
+            color="#ad97e3",
+            fontweight="bold",
+            ha="center",
+            va="bottom",
+            rotation=90,
+            fontsize=12,
+        ).set_path_effects([PathEffects.withStroke(linewidth=3, foreground="black")])
+
+    plt.title(f"Highest Grossing Film Per Year After {year}")
+    plt.xlabel("Release Year")
+    plt.ylabel("Revenue")
+    plt.xticks(top_movies["release_year"], rotation=45)
+    plt.grid(axis="y", alpha=0.75)
+    plt.gcf().set_facecolor("orange")
+    plt.tight_layout()
+    plt.savefig("data/highest_grossing_by_year.png")
+
+
 def plot_vote_distribution():
     """
     Plot histogram showing vote average distribution
@@ -150,10 +207,11 @@ def plot_vote_distribution():
 
 if __name__ == "__main__":
     # for testing purposes
-    movies_df, _ = load_data("data/horror_movies.csv")
-    print(analyze_basic_data(movies_df))
-    print(analyze_column(movies_df, "budget"))
+    # movies_df, _ = load_data("data/horror_movies.csv")
+    # print(analyze_basic_data(movies_df))
+    # print(analyze_column(movies_df, "budget"))
 
-    plot_movies(movies_df, 2000)
-    plot_vote_distribution()
-
+    # plot_movies(movies_df, 2000)
+    # highest_gross_histogram(movies_df, 2010)
+    # plot_vote_distribution()
+    pass

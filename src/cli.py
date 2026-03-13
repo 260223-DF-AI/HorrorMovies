@@ -207,6 +207,8 @@ def presentation() -> None:
     input()
     clear_terminal()
 
+    input("What year do we want to start seeing the highest grossing horror films from? ")
+
     plot_vote_distribution()
     with Image.open("data/vote_distribution.png") as img:
         print(f"[bold green i]Opening bar graph displaying the vote distribution among the dataset's ratings![/]")
