@@ -137,10 +137,24 @@ def plot_vote_distribution():
         query = session.query(Movie, Rating).join(Rating, Movie.id == Rating.movie_id).where(Rating.vote_average > 0)
         df = pd.read_sql_query(query.statement, session.bind)
 
+    all_values = pd.Series([round(x * 0.1, 1) for x in range(0, 101)])
+    counts = df["vote_average"].value_counts()
+    full_counts = all_values.map(counts).fillna(0)
+
     plt.figure(figsize=(17,7))
-    ax = sns.countplot(x='vote_average',  data= df)
+    plt.gcf().set_facecolor("orange")
+    ax = plt.bar(all_values, full_counts, width=0.08, color="black", edgecolor="black")
+    ax = plt.gca()
+
+    ticks = [x for x in all_values if x % 0.5 == 0]
+
+    ax.set_xticks(ticks)
+    ax.set_xticklabels(ticks)
+
+    # ax = sns.countplot(x='vote_average',  data= df)
     ax.set(title = "average vote distribution", xlabel="vote average", ylabel = "Total Count")
-    plt.xticks(rotation=60)
+    # ax.set_xticks([tick for tick in ax.get_xticks() if tick % 0.5 == 0])
+    # plt.xticks(rotation=60)
     plt.savefig("data/vote_distribution.png")
 
 

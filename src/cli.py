@@ -151,7 +151,7 @@ def yearly_movie_release_count() -> None:
         df = pd.read_sql_query(query, session.bind)
         df.rename(columns={"release_year": "Release Year", "count_1": "Movie Count"}, inplace=True)
 
-        print_side_by_side(df[df["Release Year"] > 2010], ("src/cli.py", (137, 148)), title="Horror Movie Release Year Totals")
+        print_side_by_side(df[df["Release Year"] > 2010], ("src/cli.py", (137, 151)), title="Horror Movie Release Year Totals")
 
 @log_execution
 def get_movie(title: str="Friday the 13th Part VIII: Jason Takes Manhattan") -> None:
@@ -182,6 +182,7 @@ def presentation() -> None:
     practical use of our project's database
     """
     clear_terminal()
+    clear_terminal()
 
     title = ""
     while title != "pass":
@@ -211,6 +212,8 @@ def presentation() -> None:
     with Image.open("data/vote_distribution.png") as img:
         print(f"[bold green i]Opening bar graph displaying the vote distribution among the dataset's ratings![/]")
         img.show()
+
+    input()
 
 
 if __name__ == "__main__":
